@@ -22,6 +22,10 @@
       git commit -m "コミットメッセージ"
       git push
   ```
+- main ブランチから今のブランチにマージする
+  ```git
+      git merge main
+  ```
 - ブランチを切り替える
   ```git
       git checkout ブランチ名
