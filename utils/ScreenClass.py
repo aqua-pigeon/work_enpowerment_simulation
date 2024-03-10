@@ -14,6 +14,7 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
+BROWN = (165, 42, 42)
 
 
 class Screen:
@@ -241,4 +242,46 @@ class Screen:
             img_people.draw(self.screen, queue_x, bar_center_y)
 
     def draw_drip_meter(self, dripNum):
-        pass
+        gage_num = 5
+        meter_x_start = 510
+        meter_y_start = 495
+        meter_width = 30
+        meter_height = 50
+        meter_row_height = int(meter_height / gage_num)
+
+        # メーターの中身を描画
+        for i in range(dripNum):
+            meter_y = meter_y_start + meter_row_height * (gage_num - 1 - i)
+            pygame.draw.rect(
+                self.screen,
+                BROWN,
+                (meter_x_start, meter_y, meter_width, meter_row_height),
+                0,
+            )
+
+        # メーターの枠を描画
+        pygame.draw.rect(
+            self.screen,
+            BLACK,
+            (meter_x_start, meter_y_start, meter_width, meter_height),
+            1,
+        )
+
+        # メーターの仕切りを描画
+        for i in range(gage_num):
+            meter_y = meter_y_start + meter_row_height * i
+            pygame.draw.line(
+                self.screen,
+                BLACK,
+                (meter_x_start, meter_y),
+                (meter_x_start + meter_width - 1, meter_y),
+                1,
+            )
+        # テキストを描画(n/gage_num)
+        self.draw_text(
+            text=f"{dripNum}/{gage_num}",
+            x=int(meter_x_start + meter_width / 2),
+            y=int(meter_y_start - 10),
+            font_size=20,
+            color=BLACK,
+        )

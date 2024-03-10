@@ -60,6 +60,7 @@ def main():
             regi_num=2, waitingNum=3
         )  # レジ2の待ち人数を描画
         screen_instance.draw_bar_waitingPeople(waitingNum=20)  # バーの待ち人数を描画
+        screen_instance.draw_drip_meter(dripNum=2)  # ドリップの残量を描画
 
         pygame.display.flip()  # 画面を更新
 
