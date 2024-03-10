@@ -14,15 +14,18 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
+BROWN = (165, 42, 42)
 
 
 class Screen:
     def __init__(self):
         # ウィンドウの設定
+        pygame.init()  # Pygameの初期化
         screen_width = int(os.getenv("SCREEN_WIDTH"))
         screen_height = int(os.getenv("SCREEN_HEIGHT"))
         self.screen = pygame.display.set_mode((screen_width, screen_height))
         pygame.display.set_caption("WORK_ENVIRONMENT_SIMULATION")
+        pygame.time.Clock().tick(30)  # FPSを30に設定
 
     def clear(self):
         self.screen.fill(WHITE)
@@ -208,5 +211,78 @@ class Screen:
             x=int(info_bar_width * 15 / 4),
             y=int(info_bar_height * 3 / 4),
             font_size=int(info_bar_height / 3),
+            color=BLACK,
+        )
+
+    def draw_regi_waitingPeople(self, regi_num, waitingNum):
+        img_width = 80
+        img_height = 60
+        img_people = ImgClass.Img(
+            "img/figure_standing.png", img_width, img_height
+        )  # 画像の読み込み
+        regi_center_x = 290 if regi_num == 1 else 390
+        regi_y = 300
+        queue_y_offset = 20
+        queue_y_length = 100
+        queue_y_end = regi_y - queue_y_offset
+        for i in range(waitingNum - 1, -1, -1):
+            queue_y = queue_y_end - queue_y_length / waitingNum * i
+            img_people.draw(self.screen, regi_center_x, queue_y)
+
+    def draw_bar_waitingPeople(self, waitingNum):
+        img_width = 80
+        img_height = 60
+        img_people = ImgClass.Img(
+            "img/figure_standing.png", img_width, img_height
+        )  # 画像の読み込み
+        bar_center_y = 275
+        bar_x = 750
+        queue_x_length = 200
+        for i in range(waitingNum - 1, -1, -1):
+            queue_x = bar_x - queue_x_length / waitingNum * i
+            img_people.draw(self.screen, queue_x, bar_center_y)
+
+    def draw_drip_meter(self, dripNum):
+        gage_num = 5
+        meter_x_start = 510
+        meter_y_start = 495
+        meter_width = 30
+        meter_height = 50
+        meter_row_height = int(meter_height / gage_num)
+
+        # メーターの中身を描画
+        for i in range(dripNum):
+            meter_y = meter_y_start + meter_row_height * (gage_num - 1 - i)
+            pygame.draw.rect(
+                self.screen,
+                BROWN,
+                (meter_x_start, meter_y, meter_width, meter_row_height),
+                0,
+            )
+
+        # メーターの枠を描画
+        pygame.draw.rect(
+            self.screen,
+            BLACK,
+            (meter_x_start, meter_y_start, meter_width, meter_height),
+            1,
+        )
+
+        # メーターの仕切りを描画
+        for i in range(gage_num):
+            meter_y = meter_y_start + meter_row_height * i
+            pygame.draw.line(
+                self.screen,
+                BLACK,
+                (meter_x_start, meter_y),
+                (meter_x_start + meter_width - 1, meter_y),
+                1,
+            )
+        # テキストを描画(n/gage_num)
+        self.draw_text(
+            text=f"{dripNum}/{gage_num}",
+            x=int(meter_x_start + meter_width / 2),
+            y=int(meter_y_start - 10),
+            font_size=20,
             color=BLACK,
         )
