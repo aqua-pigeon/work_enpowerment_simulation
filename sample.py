@@ -108,9 +108,23 @@ def main():
     # increase_text = font.render("decrease", True, BLACK)
     # increase_text_rect = increase_text.get_rect(center=increase_button.center)
 
-    # カウントアップのイベント
-    INCREASE_EVENT = pygame.USEREVENT + 1
-    pygame.time.set_timer(INCREASE_EVENT, 3000)  # 3000ミリ秒ごとに増加する
+    # # カウントアップのイベント
+    # INCREASE_EVENT = pygame.USEREVENT + 1
+    # pygame.time.set_timer(INCREASE_EVENT, 3000)  # 3000ミリ秒ごとに増加する
+
+    # レジの状態
+    reg1_free = False
+    reg2_free = True
+
+    # レジの接客カウントダウン
+    reg1_time = 0
+    reg2_time = 0
+
+    # お客さんの増加タイマー
+    customer_timer = 0
+
+    # レジ2のボタンの状態
+    reg2_button_clicked = False
 
     # 画像の読み込み
     img_regi_barista = Img("img/barista.png", 80, 60)
@@ -118,7 +132,9 @@ def main():
     img_people=Img("img/figure_standing.png", 80, 60)
 
     # ゲームループ
-    while True:
+    running = True
+    reg1_time = 300
+    while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:  # Pygameの終了
                 pygame.quit()
@@ -151,6 +167,9 @@ def main():
 
         # 画面を更新
         pygame.display.flip()
+
+        # ゲームのフレームレートを設定
+        pygame.time.Clock().tick(30)
 
 if __name__ == "__main__":
     main()
