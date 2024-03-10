@@ -3,6 +3,7 @@ import sys
 
 import pygame
 from dotenv import load_dotenv
+import random
 
 pygame.init()  # Pygameの初期化
 load_dotenv()  # .envから環境変数を取得する。定数値の設定は別ファイルにしたほうが管理しやすいから
@@ -249,31 +250,96 @@ def main():
     # INCREASE_EVENT = pygame.USEREVENT + 1
     # pygame.time.set_timer(INCREASE_EVENT, 3000)  # 3000ミリ秒ごとに増加する
 
+    # # レジの状態
+    # reg1_free = False
+    # reg2_free = True
+
+    # # レジの接客カウントダウン
+    # reg1_time = 0
+    # reg2_time = 0
+
+    # # お客さんの増加タイマー
+    # customer_timer = 0
+
+    # # レジ2のボタンの状態
+    # reg2_button_clicked = False
+
     # レジの状態
-    reg1_free = False
+    reg1_free = True
     reg2_free = True
 
-    # レジの接客カウントダウン
+    # レジの接客時間
     reg1_time = 0
     reg2_time = 0
 
-    # お客さんの増加タイマー
-    customer_timer = 0
+    # 待ち行列の人数
+    waiting_regi = 0
+    waiting_bar = 0
 
-    # レジ2のボタンの状態
-    reg2_button_clicked = False
+    # サービスされた人数と作成されたドリンクの数
+    served = 0
+    drip_coffee = 0
+
 
     # 画像の読み込み
     img_people = Img("img/figure_standing.png", 80, 60)
 
     # ゲームループ
     running = True
-    reg1_time = 300
     while running:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:  # Pygameの終了
+            if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
+        screen.fill(WHITE)
+
+        draw_field(screen)
+        draw_info_bar_frame(screen)
+        draw_info_bar_value(screen, waiting_regi, waiting_bar, served, drip_coffee)
+
+        # お客さんの増加
+        if pygame.time.get_ticks() % 150 == 0:
+            waiting_regi += 1
+        if pygame.time.get_ticks() % 300 == 0:
+            waiting_regi += 2
+
+        # レジの接客
+        if reg1_free and waiting_regi > 0:
+            reg1_free = False
+            waiting_regi -= 1
+            reg1_time = random.choice([10, 20])
+        if reg2_free and waiting_bar > 0:
+            reg2_free = False
+            waiting_bar -= 1
+            reg2_time = random.choice([10, 20])
+
+        # レジのカウントダウン
+        if reg1_time > 0:
+            reg1_time -= 1
+            if reg1_time == 0:
+                # バーでドリンクを作成
+                waiting_bar += 1
+                reg1_free = True
+        if reg2_time > 0:
+            reg2_time -= 1
+            if reg2_time == 0:
+                # バーでドリンクを作成
+                waiting_bar += 1
+                reg2_free = True
+
+        # ドリンクの作成
+        if waiting_bar > 0:
+            waiting_bar -= 1
+            served += 1
+
+#    running = True
+#     reg1_time = 300
+#     while running:
+#         for event in pygame.event.get():
+#             if event.type == pygame.QUIT:  # Pygameの終了
+#                 pygame.quit()
+#                 sys.exit()
             # elif event.type == INCREASE_EVENT:
             #     wait_count += 1
             # elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -289,7 +355,7 @@ def main():
 
         # インフォメーションバーを描画
         draw_info_bar_frame(screen)
-        draw_info_bar_value(screen, wait_count, 0, 0, 0)
+        draw_info_bar_value(screen, wait_count, waiting_bar, served, drip_coffee)
 
         # 画像を描画
         draw_regi_barista(screen, regi_num=1)  # レジ1のバリスタを描画
