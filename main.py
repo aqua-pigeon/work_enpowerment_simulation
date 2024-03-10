@@ -12,6 +12,11 @@ pygame.init()  # Pygameの初期化
 def main():
     screen_instance = ScreenClass.Screen()  # screenClassのインスタンスを生成
 
+    waiting_regi = 0  # レジで待っている人数
+    waiting_bar = 0  # バーで待っている人数
+    served = 0  # サーブされた人数
+    drip_coffee = 0  # ドリップコーヒーの残量
+
     # レジの状態
     reg1_free = True
     reg2_free = True
