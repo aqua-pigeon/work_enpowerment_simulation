@@ -1,10 +1,8 @@
 import os
-import sys
 
 import pygame
 from dotenv import load_dotenv
 
-pygame.init()  # Pygameの初期化
 load_dotenv()  # .envから環境変数を取得する。定数値の設定は別ファイルにしたほうが管理しやすいから
 
 # 色の定義 (RGB)
@@ -16,13 +14,13 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
 
-def screen_init():
-    # ウィンドウの設定
-    screen_width = int(os.getenv("SCREEN_WIDTH"))
-    screen_height = int(os.getenv("SCREEN_HEIGHT"))
-    screen = pygame.display.set_mode((screen_width, screen_height))
-    pygame.display.set_caption("WORK_ENVIRONMENT_SIMULATION")
-    return screen
+class Screen:
+    def __init__(self):
+        # ウィンドウの設定
+        screen_width = int(os.getenv("SCREEN_WIDTH"))
+        screen_height = int(os.getenv("SCREEN_HEIGHT"))
+        self.screen = pygame.display.set_mode((screen_width, screen_height))
+        pygame.display.set_caption("WORK_ENVIRONMENT_SIMULATION")
 
 
 class Img:
@@ -232,82 +230,3 @@ def draw_info_bar_value(
         font_size=int(info_bar_height / 3),
         color=BLACK,
     )
-
-
-def main():
-    screen = screen_init()  # screenの取得
-
-    wait_count = 0  # 待ち人数
-    # font = pygame.font.Font(None, 40)  # デフォルトフォント、サイズ40
-
-    # 待ち人数を増やすボタン
-    # increase_button = pygame.Rect(50, 50, 200, 100)
-    # increase_text = font.render("decrease", True, BLACK)
-    # increase_text_rect = increase_text.get_rect(center=increase_button.center)
-
-    # # カウントアップのイベント
-    # INCREASE_EVENT = pygame.USEREVENT + 1
-    # pygame.time.set_timer(INCREASE_EVENT, 3000)  # 3000ミリ秒ごとに増加する
-
-    # レジの状態
-    reg1_free = False
-    reg2_free = True
-
-    # レジの接客カウントダウン
-    reg1_time = 0
-    reg2_time = 0
-
-    # お客さんの増加タイマー
-    customer_timer = 0
-
-    # レジ2のボタンの状態
-    reg2_button_clicked = False
-
-    # 画像の読み込み
-    img_people = Img("img/figure_standing.png", 80, 60)
-
-    # ゲームループ
-    running = True
-    reg1_time = 300
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:  # Pygameの終了
-                pygame.quit()
-                sys.exit()
-            # elif event.type == INCREASE_EVENT:
-            #     wait_count += 1
-            # elif event.type == pygame.MOUSEBUTTONDOWN:
-            #     if event.button == 1:  # 左クリック
-            #         if increase_button.collidepoint(event.pos):  # ボタンがクリックされたか確認
-            #             wait_count -= 1
-
-        # 画面を白で塗りつぶす
-        screen.fill(WHITE)
-
-        # フィールドを描画
-        draw_field(screen)
-
-        # インフォメーションバーを描画
-        draw_info_bar_frame(screen)
-        draw_info_bar_value(screen, wait_count, 0, 0, 0)
-
-        # 画像を描画
-        draw_regi_barista(screen, regi_num=1)  # レジ1のバリスタを描画
-        draw_regi_barista(screen, regi_num=2)  # レジ2のバリスタを描画
-        draw_bar_barista(screen, barista_num=1)  # バー1のバリスタを描画
-        draw_bar_barista(screen, barista_num=2)  # バー2のバリスタを描画
-        draw_drip_barista(screen)
-
-        # ボタンを描画
-        # pygame.draw.rect(screen, BLACK, increase_button)
-        # screen.blit(increase_text, increase_text_rect)
-
-        # 画面を更新
-        pygame.display.flip()
-
-        # ゲームのフレームレートを設定
-        # pygame.time.Clock().tick(30)
-
-
-if __name__ == "__main__":
-    main()
