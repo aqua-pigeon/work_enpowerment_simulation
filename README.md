@@ -38,8 +38,8 @@
 ## ライブラリのインストール
 
 - 使用ライブラリ一覧
-  requirements.txt に記載  
-  pip でインストールする
+  - requirements.txt に記載
+  - pip でインストールする
 - インストール
   ```sh
       pip install -r requirements.txt
