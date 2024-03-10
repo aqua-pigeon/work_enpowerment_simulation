@@ -1,3 +1,2 @@
-## （ライブラリ一括インストール）pip3 install -r requirements.txt
 pygame==2.5.2
 python-dotenv==1.0.1
