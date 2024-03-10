@@ -20,6 +20,7 @@ BROWN = (165, 42, 42)
 class Screen:
     def __init__(self):
         # ウィンドウの設定
+        pygame.init()  # Pygameの初期化
         screen_width = int(os.getenv("SCREEN_WIDTH"))
         screen_height = int(os.getenv("SCREEN_HEIGHT"))
         self.screen = pygame.display.set_mode((screen_width, screen_height))

@@ -6,8 +6,6 @@ import pygame
 import utils.ImgClass as ImgClass
 import utils.ScreenClass as ScreenClass
 
-pygame.init()  # Pygameの初期化
-
 
 def main():
     screen_instance = ScreenClass.Screen()  # screenClassのインスタンスを生成
