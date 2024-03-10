@@ -139,8 +139,8 @@ def main():
             if event.type == pygame.QUIT:  # Pygameの終了
                 pygame.quit()
                 sys.exit()
-            elif event.type == INCREASE_EVENT:
-                wait_count += 1
+            # elif event.type == INCREASE_EVENT:
+            #     wait_count += 1
             # elif event.type == pygame.MOUSEBUTTONDOWN:
             #     if event.button == 1:  # 左クリック
             #         if increase_button.collidepoint(event.pos):  # ボタンがクリックされたか確認
@@ -169,7 +169,7 @@ def main():
         pygame.display.flip()
 
         # ゲームのフレームレートを設定
-        pygame.time.Clock().tick(30)
+        # pygame.time.Clock().tick(30)
 
 if __name__ == "__main__":
     main()
