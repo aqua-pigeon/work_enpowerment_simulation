@@ -31,9 +31,6 @@ def main():
     # レジ2のボタンの状態
     reg2_button_clicked = False
 
-    # 画像の読み込み
-    img_people = ImgClass.Img("img/figure_standing.png", 80, 60)
-
     # ゲームループ
     running = True
     reg1_time = 300
@@ -55,7 +52,14 @@ def main():
         screen_instance.draw_regi_barista(regi_num=2)  # レジ2のバリスタを描画
         screen_instance.draw_bar_barista(barista_num=1)  # バー1のバリスタを描画
         screen_instance.draw_bar_barista(barista_num=2)  # バー2のバリスタを描画
-        screen_instance.draw_drip_barista()
+        screen_instance.draw_drip_barista()  # ドリップの位置にバリスタを描画
+        screen_instance.draw_regi_waitingPeople(
+            regi_num=1, waitingNum=10
+        )  # レジ1の待ち人数を描画
+        screen_instance.draw_regi_waitingPeople(
+            regi_num=2, waitingNum=3
+        )  # レジ2の待ち人数を描画
+        screen_instance.draw_bar_waitingPeople(waitingNum=20)  # バーの待ち人数を描画
 
         pygame.display.flip()  # 画面を更新
 

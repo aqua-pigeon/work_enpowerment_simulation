@@ -23,6 +23,7 @@ class Screen:
         screen_height = int(os.getenv("SCREEN_HEIGHT"))
         self.screen = pygame.display.set_mode((screen_width, screen_height))
         pygame.display.set_caption("WORK_ENVIRONMENT_SIMULATION")
+        pygame.time.Clock().tick(30)  # FPSを30に設定
 
     def clear(self):
         self.screen.fill(WHITE)
@@ -210,3 +211,34 @@ class Screen:
             font_size=int(info_bar_height / 3),
             color=BLACK,
         )
+
+    def draw_regi_waitingPeople(self, regi_num, waitingNum):
+        img_width = 80
+        img_height = 60
+        img_people = ImgClass.Img(
+            "img/figure_standing.png", img_width, img_height
+        )  # 画像の読み込み
+        regi_center_x = 290 if regi_num == 1 else 390
+        regi_y = 300
+        queue_y_offset = 20
+        queue_y_length = 100
+        queue_y_end = regi_y - queue_y_offset
+        for i in range(waitingNum - 1, -1, -1):
+            queue_y = queue_y_end - queue_y_length / waitingNum * i
+            img_people.draw(self.screen, regi_center_x, queue_y)
+
+    def draw_bar_waitingPeople(self, waitingNum):
+        img_width = 80
+        img_height = 60
+        img_people = ImgClass.Img(
+            "img/figure_standing.png", img_width, img_height
+        )  # 画像の読み込み
+        bar_center_y = 275
+        bar_x = 750
+        queue_x_length = 200
+        for i in range(waitingNum - 1, -1, -1):
+            queue_x = bar_x - queue_x_length / waitingNum * i
+            img_people.draw(self.screen, queue_x, bar_center_y)
+
+    def draw_drip_meter(self, dripNum):
+        pass
