@@ -5,6 +5,7 @@ import time
 import pygame
 
 import utils.bar as bar
+import utils.log as log
 import utils.regi as regi
 import utils.ScreenClass as ScreenClass
 
@@ -12,6 +13,9 @@ import utils.ScreenClass as ScreenClass
 def main():
     screen_instance = ScreenClass.Screen()  # screenClassのインスタンスを生成
     start_time = time.time()  # ゲームの開始時間を記録
+    log_file_name = (
+        time.strftime("%Y%m%d_%H%M%S", time.localtime()) + ".json"
+    )  # ログファイル名を生成
     status = {
         "bar_baristaNum": 1,  # バーのバリスタの数
         "regi_baristaNum": 1,  # レジのバリスタの数
@@ -65,6 +69,8 @@ def main():
             time.time() - start_time
         )  # 経過時間を計算（小数点切り捨ての、秒）
         # print(status["elapsed_time"])
+
+        log.dump_log("log/" + log_file_name, status)  # ログを出力
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
