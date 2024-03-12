@@ -19,7 +19,8 @@ def main():
         "regi2_time": 0,  # 接客時間
         "regi1_start_time": 0,  # 接客開始時間
         "regi2_start_time": 0,  # 接客開始時間
-        "bar_time": 0,  # 接客時間
+        "bar_time": 0,  # ドリンク作成時間
+        "bar_start_time":0,#ドリンク作成開始時間
         "waiting_regi": 0,  # 待ち行列の人数
         "waiting_regi_unserviced":0, #メニューを渡されてない人
         "waiting_bar": 0,  # 待ち行列の人数
@@ -34,13 +35,46 @@ def main():
     # flag
     arrive_1_flag=True #到着を受理していいか否か
     arrive_2_flag=True
-    # regi service ime
+    # regi service time
     regi_service_base_time=10
+    
     # serviced_time
     regi_serviced_time=0
+    regi2_serviced_time=0
+    
     # is_reg_free
     is_reg1_free=True
     is_reg2_free=True
+    #is_bar_free
+    is_bar_free=True
+
+    #OSの人がレジにいるか
+    os_regi=False
+    #OSの人がバーにいるか
+    os_bar=False
+
+    for event in pygame.event.get():
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:  # 左クリック
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                        # レジ2の領域がボタンとして押されたかどうかを確認
+                if (350 < mouse_x < 430 and 300 < mouse_y < 350):
+                    os_regi==True
+                    if event.button == 1:  # 左クリック
+                        mouse_x, mouse_y = pygame.mouse.get_pos()
+                        # レジ2の領域がボタンとして押されたかどうかを確認
+                        if (350 < mouse_x < 430 and 300 < mouse_y < 350):
+                            os_regi==False
+
+                if (500 < mouse_x < 800 and 300 < mouse_y < 400):
+                    os_bar==True
+                    if event.button == 1:  # 左クリック
+                        mouse_x, mouse_y = pygame.mouse.get_pos()
+                        # barの領域がボタンとして押されたかどうかを確認
+                        if (500 < mouse_x < 800 and 300 < mouse_y < 400):
+                            os_bar==False
+    
+
 
     # ゲームループ
     running = True
@@ -72,7 +106,7 @@ def main():
             arrive_2_flag=True
 
         # レジの接客
-        if is_reg1_free and status["waiting_regi"]>0:
+        if os_regi==False and is_reg1_free and status["waiting_regi"]>0:
             regi_serviced_time+=1
             if regi_serviced_time%3==0:
                 status["regi1_time"] = regi_service_base_time*2
@@ -80,7 +114,7 @@ def main():
                 status["regi1_time"] = regi_service_base_time
             status["regi1_start_time"]=time.time()
             is_reg1_free=False      
-        if math.floor(time.time()-status["regi1_start_time"]) >= status["regi1_time"]:
+        if os_regi==False and math.floor(time.time()-status["regi1_start_time"]) >= status["regi1_time"]:
             is_reg1_free=True
             status["waiting_regi"]-=1
             status["waiting_regi_unserviced"] -= 1
@@ -90,35 +124,53 @@ def main():
                 status["waiting_bar"]+=1
             else:
                 status["waiting_bar"]+=2
-        # if is_reg2_free and status["waiting_regi"]>0:
-        #     regi_serviced_time+=1
-        #     if regi_serviced_time%3==0:
-        #         status["regi1_time"] = regi_service_base_time*2
-        #     else:
-        #         status["regi1_time"] = regi_service_base_time
-        #     status["regi1_start_time"]=time.time()
-        #     is_reg1_free=False      
-        # if math.floor(time.time()-status["regi1_start_time"]) >= status["regi1_time"]:
-        #     is_reg1_free=True
-        #     status["waiting_regi"]-=1
-        #     status["waiting_regi_unserviced"] -= 1
-        #     if status["regi1_time"]==regi_service_base_time:
-        #         status["waiting_bar"]+=1
-        #     else:
-        #         status["waiting_bar"]+=2
+        
+        #レジ2の接客
+
+        if os_regi==True and is_reg2_free==True and is_reg1_free==False and status["waiting_regi"]>0:           
+            regi2_serviced_time+=1
+            if regi2_serviced_time%3==0:
+                status["regi2_time"] = regi_service_base_time*2
+            else:
+                status["regi2_time"] = regi_service_base_time
+                status["regi2_start_time"]=time.time()
+                is_reg2_free=False      
+
+        if os_regi==True and math.floor(time.time()-status["regi2_start_time"]) >= status["regi2_time"]:
+            is_reg2_free=True
+            status["waiting_regi"]-=1
+            status["waiting_regi_unserviced"] -= 1
+            if status["waiting_regi_unserviced"] < 0:
+                status["waiting_regi_unserviced"]=0
+            if status["regi2_time"]==regi_service_base_time:
+                status["waiting_bar"]+=1                                            
+            else:
+                status["waiting_bar"]+=2
+                               
 
 
+        # ドリンクの作成(バリスタ1人)
+        if os_bar==False and is_bar_free and status["waiting_bar"] > 0:
+            status["bar_time"]+=1          
+            status["bar_start_time"]=time.time()
+            is_bar_free=False      
+        if os_bar==False and math.floor(time.time()-status["bar_start_time"]) >= 10:
+            is_bar_free=True
+            status["waiting_bar"]-=1
+            status["served"]+=1
+            status["bar_time"]=0
 
-        # ドリンクの作成
-        if status["waiting_bar"] > 0:
-            if status["bar_time"] == 0:
-                status["bar_time"] = 10  # 10秒かかる
-
-            if status["bar_time"] > 0:
-                status["bar_time"] -= 1
-                status["waiting_bar"] -= 1
-                status["served"] += 1
-                status["bar_time"] = 10  # ドリンク作成のカウントをリセット
+        # ドリンクの作成(バリスタ２人)
+        if os_bar==True and is_bar_free==False and status["waiting_bar"] > 0:
+            status["bar_time"]+=1         
+            status["bar_start_time"]=time.time()
+            is_bar_free=False      
+        if os_bar==True and math.floor(time.time()-status["bar_start_time"]) >= 5:
+            is_bar_free=True
+            status["waiting_bar"]-=1
+            status["served"]+=1
+            status["bar_time"]=0
+            
 
         #    running = True
         #     reg1_time = 300
@@ -162,6 +214,8 @@ def main():
             status["waiting_bar"]
         )  # バーの待ち人数を描画
         screen_instance.draw_drip_meter(status["drip_meter"])  # ドリップの残量を描画
+
+
 
         pygame.display.flip()  # 画面を更新
 
