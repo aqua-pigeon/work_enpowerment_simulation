@@ -75,36 +75,8 @@ def main():
         status = regi.regi_service(status)  # レジの接客管理
         status = bar.bar_service(status)  # バーのドリンク作成管理
 
-        # # ドリンクの作成(バリスタ２人)
-        # if   is_bar_free == False and status["waiting_bar"] > 0:
-        #     status["bar_time"] += 1
-        #     status["bar_start_time"] = time.time()
-        #     is_bar_free = False
-        # if   math.floor(time.time() - status["bar_start_time"]) >= 5:
-        #     is_bar_free = True
-        #     status["waiting_bar"] -= 1
-        #     status["served"] += 1
-        #     status["bar_time"] = 0
-
-        #     running = True
-        #         reg1_time = 300
-        #         while running:
-        #             for event in pygame.event.get():
-        #                 if event.type == pygame.QUIT:  # Pygameの終了
-        #                     pygame.quit()
-        #                     sys.exit()
-        #     elif event.type == INCREASE_EVENT:
-        #         wait_count += 1
-        #     elif event.type == pygame.MOUSEBUTTONDOWN:
-        #         if event.button == 1:  # 左クリック
-        #             if increase_button.collidepoint(event.pos):  # ボタンがクリックされたか確認
-        #                 wait_count -= 1
-
-        # screen_instance.clear()  # 画面を白で塗りつぶす
-
         screen_instance.clear()  # 画面を白で塗りつぶす
         screen_instance.draw_field()  # フィールドを描画
-
         screen_instance.draw_info_bar_frame()  # インフォメーションバーの静的コンテンツを描画
         screen_instance.draw_info_bar_value(
             status["waiting_regi"],
@@ -112,7 +84,6 @@ def main():
             status["served"],
             status["drip_coffee"],
         )  # インフォメーションバーの動的コンテンツを描画
-
         if status["regi_baristaNum"] > 0:
             screen_instance.draw_regi_barista(regi_num=1)  # レジ1のバリスタを描画
         if status["regi_baristaNum"] > 1:
