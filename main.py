@@ -4,6 +4,7 @@ import time
 
 import pygame
 
+import utils.bar as bar
 import utils.regi as regi
 import utils.ScreenClass as ScreenClass
 
@@ -13,13 +14,12 @@ def main():
     start_time = time.time()  # ゲームの開始時間を記録
     status = {
         "bar_baristaNum": 1,  # バーのバリスタの数
-        "regi_baristaNum": 2,  # レジのバリスタの数
+        "regi_baristaNum": 1,  # レジのバリスタの数
         "drip_baristaNum": 0,  # ドリップのバリスタの数
         "regi1_time": 0,  # 接客時間
         "regi2_time": 0,  # 接客時間
         "regi1_start_time": 0,  # 接客開始時間
         "regi2_start_time": 0,  # 接客開始時間
-        "bar_time": 0,  # ドリンク作成時間
         "bar_start_time": 0,  # ドリンク作成開始時間
         "waiting_regi": 0,  # 待ち行列の人数
         "waiting_regi_unserviced": 0,  # メニューを渡されてない人
@@ -31,19 +31,10 @@ def main():
         "arrive_2_flag": True,  # 到着を受理していいか否か
         "is_reg1_free": True,  # レジ1が空いているか
         "is_reg2_free": True,  # レジ2が空いているか
+        "is_bar_free": True,  # バーが空いているか
         "elapsed_time": 0,  # 経過時間
         "regi_serviced_time": 0,  # 何人めのお客さんか
     }
-
-    # レジでの基本接客時間
-    regi_service_base_time = 10
-
-    # serviced_time
-
-    # OSの人がレジにいるか
-    os_regi = False
-    # OSの人がバーにいるか
-    os_bar = False
 
     for event in pygame.event.get():
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -82,42 +73,34 @@ def main():
 
         status = regi.regi_customer_arrive(status)  # お客さんの到着管理
         status = regi.regi_service(status)  # レジの接客管理
+        status = bar.bar_service(status)  # バーのドリンク作成管理
 
-        # # ドリンクの作成(バリスタ1人)
-        # if os_bar == False and is_bar_free and status["waiting_bar"] > 0:
+        # # ドリンクの作成(バリスタ２人)
+        # if   is_bar_free == False and status["waiting_bar"] > 0:
         #     status["bar_time"] += 1
         #     status["bar_start_time"] = time.time()
         #     is_bar_free = False
-        # if os_bar == False and math.floor(time.time() - status["bar_start_time"]) >= 10:
+        # if   math.floor(time.time() - status["bar_start_time"]) >= 5:
         #     is_bar_free = True
         #     status["waiting_bar"] -= 1
         #     status["served"] += 1
         #     status["bar_time"] = 0
 
-        # # ドリンクの作成(バリスタ２人)
-        # if os_bar == True and is_bar_free == False and status["waiting_bar"] > 0:
-        #     status["bar_time"] += 1
-        #     status["bar_start_time"] = time.time()
-        #     is_bar_free = False
-        # if os_bar == True and math.floor(time.time() - status["bar_start_time"]) >= 5:
-        # is_bar_free = True
-        # status["waiting_bar"] -= 1
-        # status["served"] += 1
-        # status["bar_time"] = 0
+        #     running = True
+        #         reg1_time = 300
+        #         while running:
+        #             for event in pygame.event.get():
+        #                 if event.type == pygame.QUIT:  # Pygameの終了
+        #                     pygame.quit()
+        #                     sys.exit()
+        #     elif event.type == INCREASE_EVENT:
+        #         wait_count += 1
+        #     elif event.type == pygame.MOUSEBUTTONDOWN:
+        #         if event.button == 1:  # 左クリック
+        #             if increase_button.collidepoint(event.pos):  # ボタンがクリックされたか確認
+        #                 wait_count -= 1
 
-        #    running = True
-        #     reg1_time = 300
-        #     while running:
-        #         for event in pygame.event.get():
-        #             if event.type == pygame.QUIT:  # Pygameの終了
-        #                 pygame.quit()
-        #                 sys.exit()
-        # elif event.type == INCREASE_EVENT:
-        #     wait_count += 1
-        # elif event.type == pygame.MOUSEBUTTONDOWN:
-        #     if event.button == 1:  # 左クリック
-        #         if increase_button.collidepoint(event.pos):  # ボタンがクリックされたか確認
-        #             wait_count -= 1
+        # screen_instance.clear()  # 画面を白で塗りつぶす
 
         screen_instance.clear()  # 画面を白で塗りつぶす
         screen_instance.draw_field()  # フィールドを描画
