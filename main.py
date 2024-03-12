@@ -13,7 +13,7 @@ def main():
     start_time = time.time()  # ゲームの開始時間を記録
     status = {
         "bar_baristaNum": 1,  # バーのバリスタの数
-        "regi_baristaNum": 1,  # レジのバリスタの数
+        "regi_baristaNum": 2,  # レジのバリスタの数
         "drip_baristaNum": 0,  # ドリップのバリスタの数
         "regi1_time": 0,  # 接客時間
         "regi2_time": 0,  # 接客時間
@@ -32,16 +32,14 @@ def main():
         "is_reg1_free": True,  # レジ1が空いているか
         "is_reg2_free": True,  # レジ2が空いているか
         "elapsed_time": 0,  # 経過時間
+        "regi_serviced_time": 0,  # 何人めのお客さんか
     }
 
     # レジでの基本接客時間
     regi_service_base_time = 10
 
     # serviced_time
-    regi_serviced_time = 0
-    regi2_serviced_time = 0
 
- 
     # OSの人がレジにいるか
     os_regi = False
     # OSの人がバーにいるか
@@ -53,20 +51,20 @@ def main():
                 mouse_x, mouse_y = pygame.mouse.get_pos()
                 # レジ2の領域がボタンとして押されたかどうかを確認
                 if 350 < mouse_x < 430 and 300 < mouse_y < 350:
-                    status["regi_baristaNum"] +=1
+                    status["regi_baristaNum"] += 1
                     if event.button == 1:  # 左クリック
                         mouse_x, mouse_y = pygame.mouse.get_pos()
                         # レジ2の領域がボタンとして押されたかどうかを確認
                         if 350 < mouse_x < 430 and 300 < mouse_y < 350:
-                            status["regi_baristaNum"] -=1
+                            status["regi_baristaNum"] -= 1
 
                 if 500 < mouse_x < 800 and 300 < mouse_y < 400:
-                    status["bar_baristaNum"] +=1
+                    status["bar_baristaNum"] += 1
                     if event.button == 1:  # 左クリック
                         mouse_x, mouse_y = pygame.mouse.get_pos()
                         # barの領域がボタンとして押されたかどうかを確認
                         if 500 < mouse_x < 800 and 300 < mouse_y < 400:
-                            status["bar_baristaNum"] -=1
+                            status["bar_baristaNum"] -= 1
 
     # ゲームループ
     running = True
@@ -82,85 +80,30 @@ def main():
                 pygame.quit()
                 sys.exit()
 
-        # お客さんの増加
-        status = regi.regi_customer_arrive(status)
+        status = regi.regi_customer_arrive(status)  # お客さんの到着管理
+        status = regi.regi_service(status)  # レジの接客管理
 
-        # レジの接客
-        if  status["is_reg1_free"] and status["waiting_regi"] > 0:
-            regi_serviced_time += 1
-            if regi_serviced_time % 3 == 0:
-                status["regi1_time"] = regi_service_base_time * 2
-            else:
-                status["regi1_time"] = regi_service_base_time
-            status["regi1_start_time"] = time.time()
-            status["is_reg1_free"] = False
-        if (
-           
-            math.floor(time.time() - status["regi1_start_time"])
-            >= status["regi1_time"]
-        ):
-            status["is_reg1_free"] = True
-            status["waiting_regi"] -= 1
-            status["waiting_regi_unserviced"] -= 1
-            if status["waiting_regi_unserviced"] < 0:
-                status["waiting_regi_unserviced"] = 0
-            if status["regi1_time"] == regi_service_base_time:
-                status["waiting_bar"] += 1
-            else:
-                status["waiting_bar"] += 2
+        # # ドリンクの作成(バリスタ1人)
+        # if os_bar == False and is_bar_free and status["waiting_bar"] > 0:
+        #     status["bar_time"] += 1
+        #     status["bar_start_time"] = time.time()
+        #     is_bar_free = False
+        # if os_bar == False and math.floor(time.time() - status["bar_start_time"]) >= 10:
+        #     is_bar_free = True
+        #     status["waiting_bar"] -= 1
+        #     status["served"] += 1
+        #     status["bar_time"] = 0
 
-        # レジ2の接客
-
-        if (
-            status["bar_baristaNum"] > 1
-            and is_reg2_free == True
-            and status["is_reg1_free"] == False
-            and status["waiting_regi"]-status["is_reg1_free"] > 0
-        ):
-            regi2_serviced_time += 1
-            if regi2_serviced_time % 3 == 0:
-                status["regi2_time"] = regi_service_base_time * 2
-            else:
-                status["regi2_time"] = regi_service_base_time
-                status["regi2_start_time"] = time.time()
-                is_reg2_free = False
-
-        if (
-            os_regi == True
-            and math.floor(time.time() - status["regi2_start_time"])
-            >= status["regi2_time"]
-        ):
-            is_reg2_free = True
-            status["waiting_regi"] -= 1
-            status["waiting_regi_unserviced"] -= 1
-            if status["waiting_regi_unserviced"] < 0:
-                status["waiting_regi_unserviced"] = 0
-            if status["regi2_time"] == regi_service_base_time:
-                status["waiting_bar"] += 1
-            else:
-                status["waiting_bar"] += 2
-
-        # ドリンクの作成(バリスタ1人)
-        if os_bar == False and is_bar_free and status["waiting_bar"] > 0:
-            status["bar_time"] += 1
-            status["bar_start_time"] = time.time()
-            is_bar_free = False
-        if os_bar == False and math.floor(time.time() - status["bar_start_time"]) >= 10:
-            is_bar_free = True
-            status["waiting_bar"] -= 1
-            status["served"] += 1
-            status["bar_time"] = 0
-
-        # ドリンクの作成(バリスタ２人)
-        if os_bar == True and is_bar_free == False and status["waiting_bar"] > 0:
-            status["bar_time"] += 1
-            status["bar_start_time"] = time.time()
-            is_bar_free = False
-        if os_bar == True and math.floor(time.time() - status["bar_start_time"]) >= 5:
-            is_bar_free = True
-            status["waiting_bar"] -= 1
-            status["served"] += 1
-            status["bar_time"] = 0
+        # # ドリンクの作成(バリスタ２人)
+        # if os_bar == True and is_bar_free == False and status["waiting_bar"] > 0:
+        #     status["bar_time"] += 1
+        #     status["bar_start_time"] = time.time()
+        #     is_bar_free = False
+        # if os_bar == True and math.floor(time.time() - status["bar_start_time"]) >= 5:
+        # is_bar_free = True
+        # status["waiting_bar"] -= 1
+        # status["served"] += 1
+        # status["bar_time"] = 0
 
         #    running = True
         #     reg1_time = 300
@@ -198,7 +141,7 @@ def main():
         if status["drip_baristaNum"] > 0:
             screen_instance.draw_drip_barista()  # ドリップの位置にバリスタを描画
         screen_instance.draw_regi_waitingPeople(
-            status["waiting_regi"], status["regi_baristaNum"]
+            status["waiting_regi"], status["is_reg1_free"], status["is_reg2_free"]
         )  # レジの待ち人数を描画
         screen_instance.draw_bar_waitingPeople(
             status["waiting_bar"]
