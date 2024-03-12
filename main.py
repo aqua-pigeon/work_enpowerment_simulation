@@ -41,12 +41,7 @@ def main():
     regi_serviced_time = 0
     regi2_serviced_time = 0
 
-    # is_reg_free
-    is_reg1_free = True
-    is_reg2_free = True
-    # is_bar_free
-    is_bar_free = True
-
+ 
     # OSの人がレジにいるか
     os_regi = False
     # OSの人がバーにいるか
@@ -58,20 +53,20 @@ def main():
                 mouse_x, mouse_y = pygame.mouse.get_pos()
                 # レジ2の領域がボタンとして押されたかどうかを確認
                 if 350 < mouse_x < 430 and 300 < mouse_y < 350:
-                    os_regi == True
+                    status["regi_baristaNum"] +=1
                     if event.button == 1:  # 左クリック
                         mouse_x, mouse_y = pygame.mouse.get_pos()
                         # レジ2の領域がボタンとして押されたかどうかを確認
                         if 350 < mouse_x < 430 and 300 < mouse_y < 350:
-                            os_regi == False
+                            status["regi_baristaNum"] -=1
 
                 if 500 < mouse_x < 800 and 300 < mouse_y < 400:
-                    os_bar == True
+                    status["bar_baristaNum"] +=1
                     if event.button == 1:  # 左クリック
                         mouse_x, mouse_y = pygame.mouse.get_pos()
                         # barの領域がボタンとして押されたかどうかを確認
                         if 500 < mouse_x < 800 and 300 < mouse_y < 400:
-                            os_bar == False
+                            status["bar_baristaNum"] -=1
 
     # ゲームループ
     running = True
@@ -91,20 +86,20 @@ def main():
         status = regi.regi_customer_arrive(status)
 
         # レジの接客
-        if os_regi == False and is_reg1_free and status["waiting_regi"] > 0:
+        if  status["is_reg1_free"] and status["waiting_regi"] > 0:
             regi_serviced_time += 1
             if regi_serviced_time % 3 == 0:
                 status["regi1_time"] = regi_service_base_time * 2
             else:
                 status["regi1_time"] = regi_service_base_time
             status["regi1_start_time"] = time.time()
-            is_reg1_free = False
+            status["is_reg1_free"] = False
         if (
-            os_regi == False
-            and math.floor(time.time() - status["regi1_start_time"])
+           
+            math.floor(time.time() - status["regi1_start_time"])
             >= status["regi1_time"]
         ):
-            is_reg1_free = True
+            status["is_reg1_free"] = True
             status["waiting_regi"] -= 1
             status["waiting_regi_unserviced"] -= 1
             if status["waiting_regi_unserviced"] < 0:
@@ -117,10 +112,10 @@ def main():
         # レジ2の接客
 
         if (
-            os_regi == True
+            status["bar_baristaNum"] > 1
             and is_reg2_free == True
-            and is_reg1_free == False
-            and status["waiting_regi"] > 0
+            and status["is_reg1_free"] == False
+            and status["waiting_regi"]-status["is_reg1_free"] > 0
         ):
             regi2_serviced_time += 1
             if regi2_serviced_time % 3 == 0:
