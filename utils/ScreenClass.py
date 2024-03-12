@@ -214,20 +214,28 @@ class Screen:
             color=BLACK,
         )
 
-    def draw_regi_waitingPeople(self, regi_num, waitingNum):
+    def draw_regi_waitingPeople(self, waitingNum):
         img_width = 80
         img_height = 60
         img_people = ImgClass.Img(
             "img/figure_standing.png", img_width, img_height
         )  # 画像の読み込み
-        regi_center_x = 290 if regi_num == 1 else 390
+        regi_x_1 = 290
+        rigi_x_2 = 390
+        regi_x_center = (regi_x_1 + rigi_x_2) // 2
         regi_y = 300
-        queue_y_offset = 20
+        regi_y_offset = 20
+        queue_y_offset = 40
         queue_y_length = 100
         queue_y_end = regi_y - queue_y_offset
-        for i in range(waitingNum - 1, -1, -1):
-            queue_y = queue_y_end - queue_y_length / waitingNum * i
-            img_people.draw(self.screen, regi_center_x, queue_y)
+        if waitingNum > 0:
+            img_people.draw(self.screen, regi_x_1, regi_y - regi_y_offset)
+        if waitingNum > 1:
+            img_people.draw(self.screen, rigi_x_2, regi_y - regi_y_offset)
+        if waitingNum > 2:
+            for i in range(waitingNum - 3, -1, -1):
+                queue_y = queue_y_end - queue_y_length / waitingNum * i
+                img_people.draw(self.screen, regi_x_center, queue_y)
 
     def draw_bar_waitingPeople(self, waitingNum):
         img_width = 80
