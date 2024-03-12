@@ -21,6 +21,7 @@ def main():
         "regi2_start_time": 0,  # 接客開始時間
         "bar_time": 0,  # 接客時間
         "waiting_regi": 0,  # 待ち行列の人数
+        "waiting_regi_unserviced":0, #メニューを渡されてない人
         "waiting_bar": 0,  # 待ち行列の人数
         "served": 0,  # サービスされた人数=作成されたドリンクの数
         "drip_coffee": 0,  # ドリップコーヒーの補充回数
@@ -48,7 +49,7 @@ def main():
 
     while running:
         elapsed_time = math.floor(time.time() - start_time)  # 経過時間を計算（秒
-        print(elapsed_time)
+        # print(elapsed_time)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -58,12 +59,14 @@ def main():
         if elapsed_time % arrive_1_interval == 0:
             if arrive_1_flag==True:
                 status["waiting_regi"] += 1
+                status["waiting_regi_unserviced"] += 1
                 arrive_1_flag=False
         else :
             arrive_1_flag = True
         if elapsed_time % arrive_2_interval == 0:
             if arrive_2_flag==True:
                 status["waiting_regi"] += 1
+                status["waiting_regi_unserviced"] += 1
                 arrive_2_flag=False
         else:
             arrive_2_flag=True
@@ -76,15 +79,33 @@ def main():
             else:
                 status["regi1_time"] = regi_service_base_time
             status["regi1_start_time"]=time.time()
-            is_reg1_free=False
-            
+            is_reg1_free=False      
         if math.floor(time.time()-status["regi1_start_time"]) >= status["regi1_time"]:
             is_reg1_free=True
             status["waiting_regi"]-=1
+            status["waiting_regi_unserviced"] -= 1
+            if status["waiting_regi_unserviced"] < 0:
+                status["waiting_regi_unserviced"]=0
             if status["regi1_time"]==regi_service_base_time:
                 status["waiting_bar"]+=1
             else:
                 status["waiting_bar"]+=2
+        # if is_reg2_free and status["waiting_regi"]>0:
+        #     regi_serviced_time+=1
+        #     if regi_serviced_time%3==0:
+        #         status["regi1_time"] = regi_service_base_time*2
+        #     else:
+        #         status["regi1_time"] = regi_service_base_time
+        #     status["regi1_start_time"]=time.time()
+        #     is_reg1_free=False      
+        # if math.floor(time.time()-status["regi1_start_time"]) >= status["regi1_time"]:
+        #     is_reg1_free=True
+        #     status["waiting_regi"]-=1
+        #     status["waiting_regi_unserviced"] -= 1
+        #     if status["regi1_time"]==regi_service_base_time:
+        #         status["waiting_bar"]+=1
+        #     else:
+        #         status["waiting_bar"]+=2
 
 
 
