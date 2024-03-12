@@ -214,7 +214,7 @@ class Screen:
             color=BLACK,
         )
 
-    def draw_regi_waitingPeople(self, waitingNum):
+    def draw_regi_waitingPeople(self, waitingNum, baristaNum):
         img_width = 80
         img_height = 60
         img_people = ImgClass.Img(
@@ -230,10 +230,10 @@ class Screen:
         queue_y_end = regi_y - queue_y_offset
         if waitingNum > 0:
             img_people.draw(self.screen, regi_x_1, regi_y - regi_y_offset)
-        if waitingNum > 1:
+        if waitingNum > 1 and baristaNum>1:
             img_people.draw(self.screen, rigi_x_2, regi_y - regi_y_offset)
-        if waitingNum > 2:
-            for i in range(waitingNum - 3, -1, -1):
+        if waitingNum-baristaNum > 0:
+            for i in range(waitingNum - baristaNum-1, -1, -1):
                 queue_y = queue_y_end - queue_y_length / waitingNum * i
                 img_people.draw(self.screen, regi_x_center, queue_y)
 
