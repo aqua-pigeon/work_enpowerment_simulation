@@ -28,8 +28,8 @@ def main():
     # ゲームループ
     running = True
     while running:
-        elapsed_time = time.time() - start_time  # 経過時間を計算（秒
-        
+        elapsed_time = int(time.time() - start_time)  # 経過時間を計算（秒
+        print(elapsed_time)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
