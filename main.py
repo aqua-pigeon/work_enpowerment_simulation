@@ -39,6 +39,7 @@ def main():
         "is_bar_free": True,  # バーが空いているか
         "elapsed_time": 0,  # 経過時間
         "regi_serviced_time": 0,  # 何人めのお客さんか
+        "os_cool_time":0, #osが作業に拘束される時間
     }
 
     for event in pygame.event.get():
