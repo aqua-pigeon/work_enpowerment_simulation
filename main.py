@@ -9,6 +9,7 @@ import utils.log as log
 import utils.regi as regi
 import utils.ScreenClass as ScreenClass
 
+pygame.init()  # Pygameの初期化
 
 def main():
     screen_instance = ScreenClass.Screen()  # screenClassのインスタンスを生成
@@ -76,6 +77,9 @@ def main():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
+
+        
 
         status = regi.regi_customer_arrive(status)  # お客さんの到着管理
         status = regi.regi_service(status)  # レジの接客管理
