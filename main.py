@@ -5,11 +5,14 @@ import time
 import pygame
 
 import utils.bar as bar
+import utils.buttonAction as buttonAction
+import utils.drip as drip
 import utils.log as log
 import utils.regi as regi
 import utils.ScreenClass as ScreenClass
 
 pygame.init()  # Pygameの初期化
+
 
 def main():
     screen_instance = ScreenClass.Screen()  # screenClassのインスタンスを生成
@@ -31,7 +34,7 @@ def main():
         "waiting_bar": 0,  # 待ち行列の人数
         "served": 0,  # サービスされた人数=作成されたドリンクの数
         "drip_coffee": 0,  # ドリップコーヒーの補充回数
-        "drip_meter": 0,  # ドリップの残量
+        "drip_meter": 5,  # ドリップの残量
         "arrive_1_flag": True,  # 到着を受理していいか否か
         "arrive_2_flag": True,  # 到着を受理していいか否か
         "is_reg1_free": True,  # レジ1が空いているか
@@ -39,29 +42,11 @@ def main():
         "is_bar_free": True,  # バーが空いているか
         "elapsed_time": 0,  # 経過時間
         "regi_serviced_time": 0,  # 何人めのお客さんか
-        "os_cool_time":0, #osが作業に拘束される時間
+        "os_cool_time": 0,  # osが作業に拘束される時間
+        "os_cool_start_time": 0,  # osが作業に拘束され始める時間
     }
-
-    for event in pygame.event.get():
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:  # 左クリック
-                mouse_x, mouse_y = pygame.mouse.get_pos()
-                # レジ2の領域がボタンとして押されたかどうかを確認
-                if 350 < mouse_x < 430 and 300 < mouse_y < 350:
-                    status["regi_baristaNum"] += 1
-                    if event.button == 1:  # 左クリック
-                        mouse_x, mouse_y = pygame.mouse.get_pos()
-                        # レジ2の領域がボタンとして押されたかどうかを確認
-                        if 350 < mouse_x < 430 and 300 < mouse_y < 350:
-                            status["regi_baristaNum"] -= 1
-
-                if 500 < mouse_x < 800 and 300 < mouse_y < 400:
-                    status["bar_baristaNum"] += 1
-                    if event.button == 1:  # 左クリック
-                        mouse_x, mouse_y = pygame.mouse.get_pos()
-                        # barの領域がボタンとして押されたかどうかを確認
-                        if 500 < mouse_x < 800 and 300 < mouse_y < 400:
-                            status["bar_baristaNum"] -= 1
+    # ボタンイベントの設定
+    buttonAction.set_event(status)
 
     # ゲームループ
     running = True
@@ -79,12 +64,10 @@ def main():
                 pygame.quit()
                 sys.exit()
 
-
-        
-
         status = regi.regi_customer_arrive(status)  # お客さんの到着管理
         status = regi.regi_service(status)  # レジの接客管理
         status = bar.bar_service(status)  # バーのドリンク作成管理
+        status = drip.drip_decrease(status)  # ドリップの残量を減らす
 
         screen_instance.clear()  # 画面を白で塗りつぶす
         screen_instance.draw_field()  # フィールドを描画

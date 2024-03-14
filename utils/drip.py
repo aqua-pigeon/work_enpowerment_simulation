@@ -1,6 +1,4 @@
-import math
 import os
-import time
 
 from dotenv import load_dotenv
 
@@ -9,12 +7,23 @@ load_dotenv()  # .envから環境変数を取得する。定数値の設定は�
 DRIP_DECREASE = int(os.getenv("DRIP_DECREASE"))
 DRIP_TIME = int(os.getenv("DRIP_TIME"))
 
-def drip(status):
-    if status["elapsed_time"]%DRIP_DECREASE==0:
-        if status["drip_meter"]>0:
-            status["drip_meter"]-=1
-    if 
-        status["os_cool_time"]=20
-        status["drip_coffee"]+=1
-        status["drip_meter"]=5
+drip_decrease_flag = True
 
+
+def drip_decrease(status):
+    global drip_decrease_flag
+    if (
+        status["elapsed_time"] % DRIP_DECREASE == 0
+    ):  # 10秒経過するごとにドリップの残量を減らす. ただし、前回の減少から10秒経過していない場合は減少しない
+        if drip_decrease_flag == False:
+            if status["drip_meter"] > 0:
+                status["drip_meter"] -= 1
+            drip_decrease_flag = True
+    else:
+        drip_decrease_flag = False
+    return status
+
+    # if
+    #     status["os_cool_time"]=20
+    #     status["drip_coffee"]+=1
+    #     status["drip_meter"]=5
