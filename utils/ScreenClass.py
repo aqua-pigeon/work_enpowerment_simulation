@@ -197,7 +197,8 @@ class Screen:
         info_bar_height = int(screen_height / 10)  # インフォメーションバーの高さ
         info_bar_width = int(screen_width / 4)  # インフォメーションバーの幅
         # フォントの設定
-        font = pygame.font.SysFont("Arial", int(info_bar_height / 3)
+        font = pygame.font.Font(
+            None, int(info_bar_height / 3)
         )  # デフォルトフォント、サイズ40
         # テキストを描画
         self.draw_text(
