@@ -96,6 +96,11 @@ class Screen:
         img_height = int(info_bar_height * 4 / 5)  # イメージアイコンの高さ
         # インフォメーションバーを描画
         pygame.draw.rect(
+            self.screen, BLACK, (50, 600, screen_width/4, info_bar_height), 1
+        
+        )  # 黒い矩形
+
+        pygame.draw.rect(
             self.screen, BLACK, (0, 0, screen_width, info_bar_height), 1
         
         )  # 黒い矩形
@@ -148,6 +153,14 @@ class Screen:
         )
         # テキストを描画
         self.draw_text(
+            text="Countdown",
+            x=100,
+            y=620,
+            font_size=int(info_bar_height / 3),
+            color=BLACK,
+        )
+
+        self.draw_text(
             text="Waiting regi",
             x=int(info_bar_width * 3 / 4),
             y=int(info_bar_height / 4),
@@ -177,17 +190,23 @@ class Screen:
         )
         
     def draw_info_bar_value(
-        self, waiting_regi, waiting_bar, served, drip_coffee
+        self, countdown_time, waiting_regi, waiting_bar, served, drip_coffee
     ):  # information barの動的な部分を描画
         screen_width = self.screen.get_width()
         screen_height = self.screen.get_height()
         info_bar_height = int(screen_height / 10)  # インフォメーションバーの高さ
         info_bar_width = int(screen_width / 4)  # インフォメーションバーの幅
         # フォントの設定
-        font = pygame.font.Font(
-            None, int(info_bar_height / 3)
+        font = pygame.font.SysFont("Arial", int(info_bar_height / 3)
         )  # デフォルトフォント、サイズ40
         # テキストを描画
+        self.draw_text(
+            text=f"{countdown_time}",
+            x=100,
+            y=650,
+            font_size=int(info_bar_height / 2),
+            color=BLACK,
+        )
         self.draw_text(
             text=f"{waiting_regi}",
             x=int(info_bar_width * 3 / 4),
