@@ -51,6 +51,7 @@ class Screen:
         self.draw_text(text="Bar", x=650, y=350, font_size=40, color=BLACK)
         self.draw_text(text="Drip", x=460, y=515, font_size=40, color=WHITE)
 
+
     def draw_regi_barista(self, regi_num):
         img_height = 60
         img_width = 80
@@ -96,7 +97,9 @@ class Screen:
         # インフォメーションバーを描画
         pygame.draw.rect(
             self.screen, BLACK, (0, 0, screen_width, info_bar_height), 1
+        
         )  # 黒い矩形
+
         # インフォメーションバーを横4つに分割
         pygame.draw.line(
             self.screen,
@@ -172,7 +175,7 @@ class Screen:
             font_size=int(info_bar_height / 3),
             color=BLACK,
         )
-
+        
     def draw_info_bar_value(
         self, waiting_regi, waiting_bar, served, drip_coffee
     ):  # information barの動的な部分を描画
