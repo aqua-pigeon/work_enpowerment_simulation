@@ -3,7 +3,7 @@ import time
 import pygame
 
 
-class ButtonAction:
+class NormalButton:
     last_click_time = 0  # 最後にクリックされた時間
     click_time = 0  # クリックされた回数
     disable_set_time = 0  # クリックが無効になった時間
@@ -61,6 +61,74 @@ class ButtonAction:
             return 0
         else:
             return self.cool_time_timer - (time.time() - self.disable_set_time)
+
+
+class TimeLinkedButton:
+    last_click_time = 0  # 最後にクリックされた時間
+    click_time = 0  # クリックされた回数
+    disable_set_time = 0  # クリックが無効になった時間
+    click_disable = False  # クリックが無効かどうか
+    cool_time = None  # デフォルトのクリックが無効になる時間
+    cool_time_timer = None  # 実際に使用するクリックが無効になる時間
+
+    def __init__(self, area_coordinate, cool_time=None):
+        self.area_coordinate = area_coordinate  # ボタンの領域を表すRectオブジェクト
+        self.area_rect = pygame.Rect(
+            area_coordinate
+        )  # ボタンの領域を表すRectオブジェクト
+        self.cool_time = cool_time  # クリックが無効になる時間
+
+    def check_button(self, events):  # ボタンがクリックされたかどうかを確認
+        if (
+            TimeLinkedButton.click_disable  # クリックが無効になっている場合
+            and not TimeLinkedButton.cool_time_timer
+            == None  # カウントダウン時間が設定されている場合
+            and time.time() - TimeLinkedButton.disable_set_time
+            > TimeLinkedButton.cool_time_timer  # カウントダウン時間が経過した場合
+        ):
+            TimeLinkedButton.click_disable = False  # クリックを有効にするフラグを立てる
+            TimeLinkedButton.cool_time_timer = None  # カウントダウン時間をリセット
+
+        if not TimeLinkedButton.click_disable:  # クリックが有効な場合
+            for event in events:  # pygame画面でのイベントを取得
+                if event.type == pygame.MOUSEBUTTONDOWN:  # クリックされた場合
+                    mouse_pos = pygame.mouse.get_pos()  # マウスの座標を取得
+                    if self.area_rect.collidepoint(
+                        mouse_pos
+                    ):  # マウスの座標がボタンの領域内にあるかどうかを確認
+                        self.last_click_time = (
+                            time.time()
+                        )  # 最後にクリックされた時間を記録
+                        self.click_time += 1
+                        if self.cool_time != None:
+                            self.set_disabled(self.cool_time)
+                        return True
+
+        return False  # ボタンクリックが無効 または ボタンクリックが有効だがクリックされていない場合
+
+    def set_disabled(
+        self,
+        cool_time=None,
+    ):  # 任意のcool_timeを設定できるように、cool_timeとcool_time_timerを分けた
+        TimeLinkedButton.click_disable = True  # クリックを無効にするフラグを立てる
+        TimeLinkedButton.disable_set_time = (
+            time.time()
+        )  # クリックが無効になった時間を記録
+        TimeLinkedButton.cool_time_timer = cool_time  # カウントダウン時間を設定(秒)
+
+    def set_enabled():
+        TimeLinkedButton.click_disable = False
+
+    def get_last_cool_time():  # クリックが無効になっているcool_timeを返す
+        if (
+            TimeLinkedButton.cool_time_timer == None
+            or TimeLinkedButton.click_disable == False
+        ):
+            return 0
+        else:
+            return TimeLinkedButton.cool_time_timer - (
+                time.time() - TimeLinkedButton.disable_set_time
+            )
 
 
 # def set_drip(status):
