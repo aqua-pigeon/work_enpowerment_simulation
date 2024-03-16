@@ -5,7 +5,7 @@ import time
 import pygame
 
 import utils.bar as bar
-import utils.ButtonAction as ButtonAction
+import utils.Button as Button
 import utils.drip as drip
 import utils.log as log
 import utils.regi as regi
@@ -18,13 +18,13 @@ def main():
     screen_instance = ScreenClass.Screen()  # screenClassのインスタンスを生成
 
     # button設定
-    field_object_coordinates =  screen_instance.field_object_coordinates
-      # フィールドのオブジェクト座標を取得
-    drip_cofee_button = ButtonAction.ButtonAction(
+    field_object_coordinates = screen_instance.field_object_coordinates
+    # フィールドのオブジェクト座標を取得
+    drip_cofee_button = Button.TimeLinkedButton(
         field_object_coordinates["drip_coffee"], 5
     )  # ドリップコーヒーのボタンの設定
-    regi2_button = ButtonAction.ButtonAction(
-        field_object_coordinates["regi2"]
+    regi2_button = Button.TimeLinkedButton(
+        field_object_coordinates["regi2"], 2
     )  # regi2のボタンの設定
 
     start_time = time.time()  # ゲームの開始時間を記録
