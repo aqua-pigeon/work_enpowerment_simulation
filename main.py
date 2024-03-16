@@ -21,7 +21,7 @@ def main():
     field_object_coordinates =  screen_instance.field_object_coordinates
       # フィールドのオブジェクト座標を取得
     drip_cofee_button = ButtonAction.ButtonAction(
-        field_object_coordinates["drip_coffee"],5
+        field_object_coordinates["drip_coffee"], 5
     )  # ドリップコーヒーのボタンの設定
     regi2_button = ButtonAction.ButtonAction(
         field_object_coordinates["regi2"]

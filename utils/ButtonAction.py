@@ -8,7 +8,8 @@ class ButtonAction:
     click_time = 0  # クリックされた回数
     disable_set_time = 0  # クリックが無効になった時間
     click_disable = False  # クリックが無効かどうか
-    disable_limit_time = None  # クリックが無効になる時間
+    cool_time = None  # デフォルトのクリックが無効になる時間
+    cool_time_timer = None  # 実際に使用するクリックが無効になる時間
 
     def __init__(self, area_coordinate, cool_time=None):
         self.area_coordinate = area_coordinate  # ボタンの領域を表すRectオブジェクト
@@ -20,12 +21,13 @@ class ButtonAction:
     def check_button(self, events):  # ボタンがクリックされたかどうかを確認
         if (
             self.click_disable  # クリックが無効になっている場合
-            and not self.disable_limit_time
+            and not self.cool_time_timer
             == None  # カウントダウン時間が設定されている場合
             and time.time() - self.disable_set_time
-            > self.countdown_time  # カウントダウン時間が経過した場合
+            > self.cool_time_timer  # カウントダウン時間が経過した場合
         ):
             self.click_disable = False  # クリックを有効にするフラグを立てる
+            self.cool_time_timer = None  # カウントダウン時間をリセット
 
         if not self.click_disable:  # クリックが有効な場合
             for event in events:  # pygame画面でのイベントを取得
@@ -44,13 +46,21 @@ class ButtonAction:
 
         return False  # ボタンクリックが無効 または ボタンクリックが有効だがクリックされていない場合
 
-    def set_disabled(self, limit_time=None):
+    def set_disabled(
+        self, cool_time=None
+    ):  # 任意のcool_timeを設定できるように、cool_timeとcool_time_timerを分けた
         self.click_disable = True  # クリックを無効にするフラグを立てる
-        self.disable_set_time = time.time()
-        self.countdown_time = limit_time  # カウントダウン時間を設定(秒)
+        self.disable_set_time = time.time()  # クリックが無効になった時間を記録
+        self.cool_time_timer = cool_time  # カウントダウン時間を設定(秒)
 
     def set_enabled(self):
         self.click_disable = False
+
+    def get_last_cool_time(self):  # クリックが無効になっているcool_timeを返す
+        if self.cool_time_timer == None or self.click_disable == False:
+            return 0
+        else:
+            return self.cool_time_timer - (time.time() - self.disable_set_time)
 
 
 # def set_drip(status):
