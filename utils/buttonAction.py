@@ -5,16 +5,17 @@ import pygame
 
 class ButtonAction:
     last_click_time = 0  # 最後にクリックされた時間
-    click_time = 0  # クリックされた時間
+    click_time = 0  # クリックされた回数
     disable_set_time = 0  # クリックが無効になった時間
     click_disable = False  # クリックが無効かどうか
     disable_limit_time = None  # クリックが無効になる時間
 
-    def __init__(self, area_coordinate):
+    def __init__(self, area_coordinate, cool_time=None):
         self.area_coordinate = area_coordinate  # ボタンの領域を表すRectオブジェクト
         self.area_rect = pygame.Rect(
             area_coordinate
         )  # ボタンの領域を表すRectオブジェクト
+        self.cool_time = cool_time  # クリックが無効になる時間
 
     def check_button(self, events):  # ボタンがクリックされたかどうかを確認
         if (
@@ -33,7 +34,12 @@ class ButtonAction:
                     if self.area_rect.collidepoint(
                         mouse_pos
                     ):  # マウスの座標がボタンの領域内にあるかどうかを確認
-                        self.click_time = time.time()  # クリックされた時間を記録
+                        self.last_click_time = (
+                            time.time()
+                        )  # 最後にクリックされた時間を記録
+                        self.click_time += 1
+                        if self.cool_time != None:
+                            self.set_disabled(self.cool_time)
                         return True
 
         return False  # ボタンクリックが無効 または ボタンクリックが有効だがクリックされていない場合
