@@ -63,7 +63,7 @@ class NormalButton:
             return self.cool_time_timer - (time.time() - self.disable_set_time)
 
 
-class TimeLinkedButton:
+class TimeLinkedButton:  # instance同士でcool_time_timerとdisable_set_time, click_disableを共有する
     last_click_time = 0  # 最後にクリックされた時間
     click_time = 0  # クリックされた回数
     disable_set_time = 0  # クリックが無効になった時間
