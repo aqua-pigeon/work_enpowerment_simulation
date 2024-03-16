@@ -5,7 +5,7 @@ import time
 import pygame
 
 import utils.bar as bar
-
+import utils.Button as Button
 import utils.drip as drip
 import utils.log as log
 import utils.regi as regi
@@ -129,11 +129,11 @@ def main():
         )  # インフォメーションバーの動的コンテンツを描画
 
         screen_instance.draw_cool_time(  # クールタイムを描画
-            int(regi2_button.get_last_cool_time()),
-            int(menu_button.get_last_cool_time()),
-            int(drip_cofee_button.get_last_cool_time()),
-            int(bar_button.get_last_cool_time()),
+            int(
+                Button.TimeLinkedButton.get_last_cool_time()
+            )  # TimeLinkedButtonが保存するクールタイムを取得
         )
+        # regi1_buttonなどから取得しないのは、regi1_buttonなどのインスタンスが存在しない場合も踏まえ、プログラムとしての汎用性を上げるため
 
         if status["regi_baristaNum"] > 0:
             screen_instance.draw_regi_barista(regi_num=1)  # レジ1のバリスタを描画

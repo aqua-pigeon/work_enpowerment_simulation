@@ -257,18 +257,12 @@ class Screen:
             color=BLACK,
         )
 
-<<<<<<< HEAD
-    def draw_cool_time(self,regi1_cool_time,regi2_cool_time, menu_cool_time, drip_cool_time):
-        self.draw_text(
-            text=f"{regi1_cool_time}",
-=======
     def draw_cool_time(
         self, *args
-    ):  # クールタイムを描画. 可変長引数をとるので*argsを使う
+    ):  # クールタイムを描画. 可変長引数をとるので*argsを使う。可変長引数は、0~n個の引数を受け取ることができて、何個引数があるかわからない場合に便利!（print()関数も同じ構造）
         time_sum = sum(args)  # クールタイムの合計を計算
         self.draw_text(
             text=f"{time_sum}",
->>>>>>> 18b9faa2816995f3bec586164241e8aa6c8c6696
             x=100,
             y=650,
             font_size=40,

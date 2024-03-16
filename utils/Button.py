@@ -119,7 +119,8 @@ class TimeLinkedButton:  # instance同士でcool_time_timerとdisable_set_time, 
     def set_enabled(self):
         TimeLinkedButton.click_disable = False
 
-    def get_last_cool_time(self):  # クリックが無効になっているcool_timeを返す
+    @staticmethod  # staticmethodを使ってクラスメソッドにする。クラスメソッドは、regi1_buttonのようにインスタンスを作らなくても、class名.メソッド名で呼び出せる
+    def get_last_cool_time():  # クリックが無効になっているcool_timeを返す
         if (
             TimeLinkedButton.cool_time_timer == None
             or TimeLinkedButton.click_disable == False
