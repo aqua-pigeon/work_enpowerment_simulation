@@ -7,9 +7,12 @@ import pygame
 import utils.bar as bar
 import utils.ButtonAction as ButtonAction
 import utils.drip as drip
+import utils.bar as bar
 import utils.log as log
 import utils.regi as regi
 import utils.ScreenClass as ScreenClass
+import utils.buttonAction as buttonAction
+
 
 pygame.init()  # Pygameの初期化
 
@@ -51,9 +54,9 @@ def main():
         "is_bar_free": True,  # バーが空いているか
         "elapsed_time": 0,  # 経過時間
         "regi_serviced_time": 0,  # 何人めのお客さんか
-        "os_cool_time": 0,  # osが作業に拘束される時間
-        "click_disabled": False,
-        "countdown_time": 5,
+        "os_cool_time":0, #osが作業に拘束される時間
+        "click_disabled" : False,
+        "countdown_time" : 5,
     }
 
     # ゲームループ
@@ -71,6 +74,14 @@ def main():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+        
+
+        
+
+        if drip_cofee_button.check_button(
+            events
+        ):  # ドリップコーヒーのボタンがクリックされた場合
+            print("drip_coffee_button clicked. time: ", status["elapsed_time"])
 
         if drip_cofee_button.check_button(
             events
@@ -92,6 +103,7 @@ def main():
             status["waiting_bar"],
             status["served"],
             status["drip_coffee"],
+            
         )  # インフォメーションバーの動的コンテンツを描画
         if status["regi_baristaNum"] > 0:
             screen_instance.draw_regi_barista(regi_num=1)  # レジ1のバリスタを描画
@@ -110,9 +122,9 @@ def main():
             status["waiting_bar"]
         )  # バーの待ち人数を描画
         screen_instance.draw_drip_meter(status["drip_meter"])  # ドリップの残量を描画
-
+        
         pygame.display.flip()  # 画面を更新
 
-
+   
 if __name__ == "__main__":
     main()
