@@ -43,6 +43,9 @@ class ButtonAction:
         self.disable_set_time = time.time()
         self.countdown_time = limit_time  # カウントダウン時間を設定(秒)
 
+    def set_enabled(self):
+        self.click_disable = False
+
 
 # def set_drip(status):
 #     for event in pygame.event.get():
