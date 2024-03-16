@@ -44,3 +44,13 @@
   ```sh
       pip install -r requirements.txt
   ```
+
+## log ファイルのクリア
+
+```ps1
+  Get-ChildItem -Path "log\" -Filter "*.json" | ForEach-Object {
+    # ファイルが.jsonであれば削除する
+    Remove-Item $_.FullName
+    Write-Output "Removed: $($_.FullName)"
+}
+```
