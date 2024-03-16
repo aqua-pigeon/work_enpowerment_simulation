@@ -69,3 +69,19 @@ class ButtonAction:
 #         else:
 #             status["click_disable"] = False
 #     return status
+
+# def menu_serve(status):
+#     if status[click]==True:
+#           if menu_rect.collidepoint(mouse_pos):
+#      # クリックを無効にするフラグを立てる
+#             status["click_disabled"] = True #クリックの無効をオンにする
+#             status["menu_start_time"] = time.time()  # メニュー配布開始時間を現在時刻にする
+#             status["countdown_time"] = 5  # カウントダウンをリセット
+#     if status["click_disabled"] == True :#クリックの無効をオンのとき
+#          if math.floor(time.time() - status["menu_start_time"])<6:# メニュー配布開始からの経過時刻が5秒経っていないとき
+#               status["countdown_time"] -= 1#カウントダウンの表示を-1する
+#          else:# メニュー配布開始からの経過時刻が5秒経ったとき
+#               status["waiting_regi_unserviced"] -=1 # メニューが配布されてない人を一人減らす
+#               status["click_disabled"] = False #クリックの無効を解除する
+#               status[click]=False #クリックを押されていないようにする
+#     return status
