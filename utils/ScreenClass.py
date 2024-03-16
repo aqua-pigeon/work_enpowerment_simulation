@@ -18,6 +18,14 @@ BROWN = (165, 42, 42)
 
 
 class Screen:
+    field_object_coordinates = {
+        "field": (200, 300, 650, 250),
+        "regi1": (250, 300, 80, 50),
+        "regi2": (350, 300, 80, 50),
+        "bar": (500, 300, 300, 100),
+        "drip_coffee": (420, 480, 80, 70),
+    }
+
     def __init__(self):
         # ウィンドウの設定
         pygame.init()  # Pygameの初期化
@@ -40,21 +48,26 @@ class Screen:
 
     def draw_field(self):
         # 座標=(x, y , 幅, 高さ)
-        pygame.draw.rect(self.screen, GREEN, (200, 300, 650, 250), 3)  # field
-        pygame.draw.rect(self.screen, RED, (250, 300, 80, 50), 0)  # regi1
-        pygame.draw.rect(self.screen, RED, (350, 300, 80, 50), 0)  # regi2
-        pygame.draw.rect(self.screen, GRAY, (500, 300, 300, 100), 0)  # bar
-        pygame.draw.rect(self.screen, BLACK, (420, 480, 80, 70), 0)  # drip coffee
-        pygame.draw.rect(self.screen, BLUE, (40, 200, 110, 90), 0)  # menu
-
-
+        pygame.draw.rect(
+            self.screen, GREEN, self.field_object_coordinates["field"], 3
+        )  # field
+        pygame.draw.rect(
+            self.screen, RED, self.field_object_coordinates["regi1"], 0
+        )  # regi1
+        pygame.draw.rect(
+            self.screen, RED, self.field_object_coordinates["regi2"], 0
+        )  # regi2
+        pygame.draw.rect(
+            self.screen, GRAY, self.field_object_coordinates["bar"], 0
+        )  # bar
+        pygame.draw.rect(
+            self.screen, BLACK, self.field_object_coordinates["drip_coffee"], 0
+        )  # drip coffee
         # テキストを描画
         self.draw_text(text="regi 1", x=290, y=325, font_size=40, color=WHITE)
         self.draw_text(text="regi 2", x=390, y=325, font_size=40, color=WHITE)
         self.draw_text(text="Bar", x=650, y=350, font_size=40, color=BLACK)
         self.draw_text(text="Drip", x=460, y=515, font_size=40, color=WHITE)
-        self.draw_text(text="Menu", x=95, y=240, font_size=40, color=WHITE)
-
 
     def draw_regi_barista(self, regi_num):
         img_height = 60
@@ -100,13 +113,11 @@ class Screen:
         img_height = int(info_bar_height * 4 / 5)  # イメージアイコンの高さ
         # インフォメーションバーを描画
         pygame.draw.rect(
-            self.screen, BLACK, (50, 600, screen_width/5, info_bar_height), 1
-        
+            self.screen, BLACK, (50, 600, screen_width / 4, info_bar_height), 1
         )  # 黒い矩形
 
         pygame.draw.rect(
             self.screen, BLACK, (0, 0, screen_width, info_bar_height), 1
-        
         )  # 黒い矩形
 
         # インフォメーションバーを横4つに分割
@@ -142,9 +153,6 @@ class Screen:
         img_espresso_maker = ImgClass.Img(
             "img/espresso_maker.png", img_width, img_height
         )
-        img_waiting_menu = ImgClass.Img(
-            "img/menu.png", img_width*2 , img_height*2
-        )
         # イメージアイコンを描画
         img_waiting_regi.draw(
             self.screen, info_bar_width * 0 + info_bar_height, info_bar_height / 2
@@ -158,10 +166,6 @@ class Screen:
         img_espresso_maker.draw(
             self.screen, info_bar_width * 3 + info_bar_height, info_bar_height / 2
         )
-        img_waiting_menu.draw(
-            self.screen, 100, 150
-        )
-
         # テキストを描画
         self.draw_text(
             text="Countdown",
@@ -199,7 +203,7 @@ class Screen:
             font_size=int(info_bar_height / 3),
             color=BLACK,
         )
-        
+
     def draw_info_bar_value(
         self, countdown_time, waiting_regi, waiting_bar, served, drip_coffee
     ):  # information barの動的な部分を描画
