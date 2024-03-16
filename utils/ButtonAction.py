@@ -52,6 +52,12 @@ class ButtonAction:
     def set_enabled(self):
         self.click_disable = False
 
+    def get_last_cool_time(self):  # クリックが無効になっているcool_timeを返す
+        if self.cool_time == None or self.click_disable == False:
+            return 0
+        else:
+            return self.cool_time - (time.time() - self.disable_set_time)
+
 
 # def set_drip(status):
 #     for event in pygame.event.get():
