@@ -253,10 +253,11 @@ class Screen:
         )
 
     def draw_cool_time(
-        self, regi1_cool_time, regi2_cool_time, menu_cool_time, drip_cool_time
-    ):
+        self, *args
+    ):  # クールタイムを描画. 可変長引数をとるので*argsを使う
+        time_sum = sum(args)  # クールタイムの合計を計算
         self.draw_text(
-            text=f"{regi1_cool_time+regi2_cool_time+menu_cool_time+drip_cool_time}",
+            text=f"{time_sum}",
             x=100,
             y=650,
             font_size=40,
