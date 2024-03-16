@@ -217,7 +217,7 @@ class Screen:
         )
 
     def draw_info_bar_value(
-        self, countdown_time, waiting_regi, waiting_bar, served, drip_coffee
+        self, waiting_regi, waiting_bar, served, drip_coffee
     ):  # information barの動的な部分を描画
         screen_width = self.screen.get_width()
         screen_height = self.screen.get_height()
@@ -228,13 +228,6 @@ class Screen:
             None, int(info_bar_height / 3)
         )  # デフォルトフォント、サイズ40
         # テキストを描画
-        self.draw_text(
-            text=f"{countdown_time}",
-            x=100,
-            y=650,
-            font_size=int(info_bar_height / 2),
-            color=BLACK,
-        )
         self.draw_text(
             text=f"{waiting_regi}",
             x=int(info_bar_width * 3 / 4),
@@ -264,6 +257,17 @@ class Screen:
             color=BLACK,
         )
 
+    def draw_cool_time(self,regi1_cool_time,regi2_cool_time, menu_cool_time, drip_cool_time):
+        self.draw_text(
+            text=f"{regi1_cool_time+regi2_cool_time+menu_cool_time+drip_cool_time}",
+            x=100,
+            y=650,
+            font_size=40,
+            color=BLACK,
+        )
+    
+
+        
     def draw_regi_waitingPeople(self, waitingNum, is_reg1_free, is_reg2_free):
         img_width = 80
         img_height = 60

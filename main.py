@@ -21,10 +21,16 @@ def main():
     field_object_coordinates = screen_instance.field_object_coordinates
     # フィールドのオブジェクト座標を取得
     drip_cofee_button = Button.TimeLinkedButton(
-        field_object_coordinates["drip_coffee"], 5
+        field_object_coordinates["drip_coffee"], 6
     )  # ドリップコーヒーのボタンの設定
     regi2_button = Button.TimeLinkedButton(
-        field_object_coordinates["regi2"], 2
+        field_object_coordinates["regi2"], 4
+    )  # regi2のボタンの設定
+    menu_button = Button.TimeLinkedButton(
+        field_object_coordinates["menu"], 3
+    )  # menuのボタンの設定
+    bar_button = Button.TimeLinkedButton(
+        field_object_coordinates["bar"], 4
     )  # regi2のボタンの設定
 
     start_time = time.time()  # ゲームの開始時間を記録
@@ -76,12 +82,43 @@ def main():
         if drip_cofee_button.check_button(
             events
         ):  # ドリップコーヒーのボタンがクリックされた場合
-            print("drip_coffee_button clicked. time: ", status["elapsed_time"])
+            # print("drip_coffee_button clicked. time: ", status["elapsed_time"])
+            status["regi_baristaNum"]=1
+            status["bar_baristaNum"]=1
+            status["drip_meter"] = 5
 
-        if regi2_button.check_button(
+        if status[
+            "regi_baristaNum"
+        ] == 1 and regi2_button.check_button(
             events
-        ):  # ドリップコーヒーのボタンがクリックされた場合
-            print("degi2_button clicked. time: ", status["elapsed_time"])
+        ):  # regi2のボタンがクリックされた場合
+            print("regi2_button clicked. time: ", status["elapsed_time"])
+
+            if status["bar_baristaNum"] > 1:
+                status["bar_baristaNum"] -= 1
+                status["regi_baristaNum"] += 1
+            else:
+                status["regi_baristaNum"] += 1
+
+        if status[
+            "bar_baristaNum"
+        ] == 1 and  bar_button.check_button(
+            events
+        ):
+            if status["regi_baristaNum"] >1:
+                status["regi_baristaNum"]-=1
+                status["bar_baristaNum"]+=1
+            else:
+                status["bar_baristaNum"] +=1
+
+        if menu_button.check_button(
+            events
+        ):  # menuのボタンがクリックされた場合
+            print("menu_button clicked. time: ", status["elapsed_time"])
+
+            status["regi_baristaNum"]=1
+            status["bar_baristaNum"]=1
+            status["waiting_regi_unserviced"] -= 1
 
         status = regi.regi_customer_arrive(status)  # お客さんの到着管理
         status = regi.regi_service(status)  # レジの接客管理
@@ -93,12 +130,18 @@ def main():
         screen_instance.draw_field()  # フィールドを描画
         screen_instance.draw_info_bar_frame()  # インフォメーションバーの静的コンテンツを描画
         screen_instance.draw_info_bar_value(
-            status["countdown_time"],
             status["waiting_regi"],
             status["waiting_bar"],
             status["served"],
             status["drip_coffee"],
         )  # インフォメーションバーの動的コンテンツを描画
+        screen_instance.draw_cool_time(
+            int(regi2_button.get_last_cool_time()),
+            int(menu_button.get_last_cool_time()),
+            int(drip_cofee_button.get_last_cool_time()),
+            int(bar_button.get_last_cool_time()),
+        )
+
         if status["regi_baristaNum"] > 0:
             screen_instance.draw_regi_barista(regi_num=1)  # レジ1のバリスタを描画
         if status["regi_baristaNum"] > 1:
