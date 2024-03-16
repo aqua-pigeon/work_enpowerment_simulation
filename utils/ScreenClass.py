@@ -24,7 +24,7 @@ class Screen:
         "regi2": (350, 300, 80, 50),
         "bar": (500, 300, 300, 100),
         "drip_coffee": (420, 480, 80, 70),
-        "menu":(60,200,100,90)
+        "menu": (60, 200, 100, 90),
     }
 
     def __init__(self):
@@ -73,7 +73,6 @@ class Screen:
         self.draw_text(text="Bar", x=650, y=350, font_size=40, color=BLACK)
         self.draw_text(text="Drip", x=460, y=515, font_size=40, color=WHITE)
         self.draw_text(text="Menu", x=110, y=240, font_size=40, color=WHITE)
-
 
     def draw_regi_barista(self, regi_num):
         img_height = 60
@@ -159,9 +158,7 @@ class Screen:
         img_espresso_maker = ImgClass.Img(
             "img/espresso_maker.png", img_width, img_height
         )
-        img_menu = ImgClass.Img(
-            "img/menu.png", img_width * 2, img_height*2
-        )
+        img_menu = ImgClass.Img("img/menu.png", img_width * 2, img_height * 2)
         # イメージアイコンを描画
         img_waiting_regi.draw(
             self.screen, info_bar_width * 0 + info_bar_height, info_bar_height / 2
@@ -175,9 +172,7 @@ class Screen:
         img_espresso_maker.draw(
             self.screen, info_bar_width * 3 + info_bar_height, info_bar_height / 2
         )
-        img_menu.draw(
-            self.screen,110,150
-        )
+        img_menu.draw(self.screen, 110, 150)
         # テキストを描画
         self.draw_text(
             text="Countdown",
@@ -257,7 +252,9 @@ class Screen:
             color=BLACK,
         )
 
-    def draw_cool_time(self,regi1_cool_time,regi2_cool_time, menu_cool_time, drip_cool_time):
+    def draw_cool_time(
+        self, regi1_cool_time, regi2_cool_time, menu_cool_time, drip_cool_time
+    ):
         self.draw_text(
             text=f"{regi1_cool_time+regi2_cool_time+menu_cool_time+drip_cool_time}",
             x=100,
@@ -265,9 +262,7 @@ class Screen:
             font_size=40,
             color=BLACK,
         )
-    
 
-        
     def draw_regi_waitingPeople(self, waitingNum, is_reg1_free, is_reg2_free):
         img_width = 80
         img_height = 60

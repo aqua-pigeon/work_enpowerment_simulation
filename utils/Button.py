@@ -116,10 +116,10 @@ class TimeLinkedButton:  # instance同士でcool_time_timerとdisable_set_time, 
         )  # クリックが無効になった時間を記録
         TimeLinkedButton.cool_time_timer = cool_time  # カウントダウン時間を設定(秒)
 
-    def set_enabled():
+    def set_enabled(self):
         TimeLinkedButton.click_disable = False
 
-    def get_last_cool_time():  # クリックが無効になっているcool_timeを返す
+    def get_last_cool_time(self):  # クリックが無効になっているcool_timeを返す
         if (
             TimeLinkedButton.cool_time_timer == None
             or TimeLinkedButton.click_disable == False

@@ -83,13 +83,11 @@ def main():
             events
         ):  # ドリップコーヒーのボタンがクリックされた場合
             # print("drip_coffee_button clicked. time: ", status["elapsed_time"])
-            status["regi_baristaNum"]=1
-            status["bar_baristaNum"]=1
+            status["regi_baristaNum"] = 1
+            status["bar_baristaNum"] = 1
             status["drip_meter"] = 5
 
-        if status[
-            "regi_baristaNum"
-        ] == 1 and regi2_button.check_button(
+        if status["regi_baristaNum"] == 1 and regi2_button.check_button(
             events
         ):  # regi2のボタンがクリックされた場合
             print("regi2_button clicked. time: ", status["elapsed_time"])
@@ -100,24 +98,18 @@ def main():
             else:
                 status["regi_baristaNum"] += 1
 
-        if status[
-            "bar_baristaNum"
-        ] == 1 and  bar_button.check_button(
-            events
-        ):
-            if status["regi_baristaNum"] >1:
-                status["regi_baristaNum"]-=1
-                status["bar_baristaNum"]+=1
+        if status["bar_baristaNum"] == 1 and bar_button.check_button(events):
+            if status["regi_baristaNum"] > 1:
+                status["regi_baristaNum"] -= 1
+                status["bar_baristaNum"] += 1
             else:
-                status["bar_baristaNum"] +=1
+                status["bar_baristaNum"] += 1
 
-        if menu_button.check_button(
-            events
-        ):  # menuのボタンがクリックされた場合
+        if menu_button.check_button(events):  # menuのボタンがクリックされた場合
             print("menu_button clicked. time: ", status["elapsed_time"])
 
-            status["regi_baristaNum"]=1
-            status["bar_baristaNum"]=1
+            status["regi_baristaNum"] = 1
+            status["bar_baristaNum"] = 1
             status["waiting_regi_unserviced"] -= 1
 
         status = regi.regi_customer_arrive(status)  # お客さんの到着管理
@@ -135,7 +127,8 @@ def main():
             status["served"],
             status["drip_coffee"],
         )  # インフォメーションバーの動的コンテンツを描画
-        screen_instance.draw_cool_time(
+
+        screen_instance.draw_cool_time(  # クールタイムを描画
             int(regi2_button.get_last_cool_time()),
             int(menu_button.get_last_cool_time()),
             int(drip_cofee_button.get_last_cool_time()),
