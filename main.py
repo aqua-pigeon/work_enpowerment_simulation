@@ -18,12 +18,14 @@ def main():
     screen_instance = ScreenClass.Screen()  # screenClassのインスタンスを生成
 
     # button設定
-    field_object_coordinates = (
-        screen_instance.field_object_coordinates
-    )  # フィールドのオブジェクト座標を取得
+    field_object_coordinates =  screen_instance.field_object_coordinates
+      # フィールドのオブジェクト座標を取得
     drip_cofee_button = ButtonAction.ButtonAction(
-        field_object_coordinates["drip_coffee"]
+        field_object_coordinates["drip_coffee"],5
     )  # ドリップコーヒーのボタンの設定
+    regi2_button = ButtonAction.ButtonAction(
+        field_object_coordinates["regi2"]
+    )  # regi2のボタンの設定
 
     start_time = time.time()  # ゲームの開始時間を記録
     log_file_name = (
@@ -76,10 +78,10 @@ def main():
         ):  # ドリップコーヒーのボタンがクリックされた場合
             print("drip_coffee_button clicked. time: ", status["elapsed_time"])
 
-        if drip_cofee_button.check_button(
+        if regi2_button.check_button(
             events
         ):  # ドリップコーヒーのボタンがクリックされた場合
-            print("drip_coffee_button clicked. time: ", status["elapsed_time"])
+            print("degi2_button clicked. time: ", status["elapsed_time"])
 
         status = regi.regi_customer_arrive(status)  # お客さんの到着管理
         status = regi.regi_service(status)  # レジの接客管理
