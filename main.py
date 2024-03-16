@@ -22,7 +22,7 @@ def main():
         screen_instance.field_object_coordinates
     )  # フィールドのオブジェクト座標を取得
     drip_cofee_button = ButtonAction.ButtonAction(
-        field_object_coordinates["drip_coffee"]
+        field_object_coordinates["drip_coffee"], 5
     )  # ドリップコーヒーのボタンの設定
 
     start_time = time.time()  # ゲームの開始時間を記録
@@ -75,11 +75,7 @@ def main():
             events
         ):  # ドリップコーヒーのボタンがクリックされた場合
             print("drip_coffee_button clicked. time: ", status["elapsed_time"])
-
-        if drip_cofee_button.check_button(
-            events
-        ):  # ドリップコーヒーのボタンがクリックされた場合
-            print("drip_coffee_button clicked. time: ", status["elapsed_time"])
+        print("drip_coffee_button cool_time ", drip_cofee_button.get_last_cool_time())
 
         status = regi.regi_customer_arrive(status)  # お客さんの到着管理
         status = regi.regi_service(status)  # レジの接客管理
