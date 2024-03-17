@@ -13,7 +13,7 @@ drip_decrease_flag = True
 def drip_decrease(status):
     global drip_decrease_flag
     if (
-        status["elapsed_time"] % DRIP_DECREASE == 0
+        int(status["elapsed_time"]) % DRIP_DECREASE == 0
     ):  # 10秒経過するごとにドリップの残量を減らす. ただし、前回の減少から10秒経過していない場合は減少しない
         if drip_decrease_flag == False:
             if status["drip_meter"] > 0:

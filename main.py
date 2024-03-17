@@ -1,8 +1,9 @@
-import math
+import os
 import sys
 import time
 
 import pygame
+from dotenv import load_dotenv
 
 import utils.bar as bar
 import utils.Button as Button
@@ -12,32 +13,44 @@ import utils.regi as regi
 import utils.ScreenClass as ScreenClass
 
 
+load_dotenv()  # .envから環境変数を取得する。定数値の設定は別ファイルにしたほうが管理しやすいから
 pygame.init()  # Pygameの初期化
 
 
 def main():
     screen_instance = ScreenClass.Screen()  # screenClassのインスタンスを生成
 
+    # 被験者の名前を入力
+    name = input("被験者の名前を入力してください: ")
+    # シミュレーションの制限時間を取得
+    limit_time = int(os.getenv("SIMULATE_TIME"))
+    log_file_name = (
+        time.strftime("%Y%m%d_%H%M%S_", time.localtime()) + name + ".json"
+    )  # ログファイル名を生成
+    log.set_meta(
+        f"log/{log_file_name}",
+        name,
+        limit_time,
+        time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime()),
+    )  # メタデータを出力
+
     # button設定
     field_object_coordinates = screen_instance.field_object_coordinates
     # フィールドのオブジェクト座標を取得
     drip_cofee_button = Button.TimeLinkedButton(
-        field_object_coordinates["drip_coffee"], 6
+        field_object_coordinates["drip_coffee"], int(os.getenv("DRIP_COFFEE_COOL_TIME"))
     )  # ドリップコーヒーのボタンの設定
     regi2_button = Button.TimeLinkedButton(
-        field_object_coordinates["regi2"], 6
+        field_object_coordinates["regi2"], int(os.getenv("REGI_COOL_TIME"))
     )  # regi2のボタンの設定
     menu_button = Button.TimeLinkedButton(
-        field_object_coordinates["menu"], 4
+        field_object_coordinates["menu"], int(os.getenv("MENU_COOL_TIME"))
     )  # menuのボタンの設定
     bar_button = Button.TimeLinkedButton(
-        field_object_coordinates["bar"], 6
+        field_object_coordinates["bar"], int(os.getenv("BAR_COOL_TIME"))
     )  # regi2のボタンの設定
 
     start_time = time.time()  # ゲームの開始時間を記録
-    log_file_name = (
-        time.strftime("%Y%m%d_%H%M%S", time.localtime()) + ".json"
-    )  # ログファイル名を生成
     status = {
         "bar_baristaNum": 1,  # バーのバリスタの数
         "regi_baristaNum": 1,  # レジのバリスタの数
@@ -58,28 +71,24 @@ def main():
         "is_reg1_free": True,  # レジ1が空いているか
         "is_reg2_free": True,  # レジ2が空いているか
         "is_bar_free": True,  # バーが空いているか
-        "elapsed_time": 0,  # 経過時間
+        "elapsed_time": 0,  # 経過時間（秒）
         "regi_serviced_time": 0,  # 何人めのお客さんか
-        "os_cool_time": 0,  # osが作業に拘束される時間
-        "click_disabled": False,
-        "countdown_time": 5,
-        "click":0,
     }
 
     # ゲームループ
     running = True
 
     while running:
-        status["elapsed_time"] = math.floor(
-            time.time() - start_time
-        )  # 経過時間を計算（小数点切り捨ての、秒）
+        status["elapsed_time"] = time.time() - start_time  # 経過時間を計算（秒）
         events = pygame.event.get()  # pygame画面でのイベントを取得
         log.dump_log("log/" + log_file_name, status)  # ログを出力
 
         for event in events:
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT:  # ウィンドウの×ボタンが押された場合
                 pygame.quit()
                 sys.exit()
+        if status["elapsed_time"] > limit_time:  # 制限時間を超えた場合
+            break  # ゲームを終了
 
         if drip_cofee_button.check_button(
             events
@@ -92,11 +101,8 @@ def main():
             status["drip_meter"] = 5
             status["click"]+=1
 
-        if  regi2_button.check_button(
-            events
-        ):  # regi2のボタンがクリックされた場合
-            print("regi2_button clicked. time: ", status["elapsed_time"])
-
+        if regi2_button.check_button(events):  # regi2のボタンがクリックされた場合
+            print("regi2_button clicked. time: ", int(status["elapsed_time"]))
             status["regi_baristaNum"] = 2
             status["bar_baristaNum"] = 1
             status["click"] += 1

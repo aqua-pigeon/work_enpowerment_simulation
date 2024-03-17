@@ -13,14 +13,14 @@ REGI_SERVICE_BASE_TIME = int(os.getenv("REGI_SERVICE_BASE_TIME"))
 
 def regi_customer_arrive(status):
     # お客さんの増加
-    if status["elapsed_time"] % ARRIVE_1_INTERVAL == 0:
+    if int(status["elapsed_time"]) % ARRIVE_1_INTERVAL == 0:
         if status["arrive_1_flag"] == True:
             status["waiting_regi"] += 1
             status["waiting_regi_unserviced"] += 1
             status["arrive_1_flag"] = False
     else:
         status["arrive_1_flag"] = True
-    if status["elapsed_time"] % ARRIVE_2_INTERVAL == 0:
+    if int(status["elapsed_time"]) % ARRIVE_2_INTERVAL == 0:
         if status["arrive_2_flag"] == True:
             status["waiting_regi"] += 1
             status["waiting_regi_unserviced"] += 1

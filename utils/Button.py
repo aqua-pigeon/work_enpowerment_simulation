@@ -21,8 +21,7 @@ class NormalButton:
     def check_button(self, events):  # ボタンがクリックされたかどうかを確認
         if (
             self.click_disable  # クリックが無効になっている場合
-            and not self.cool_time_timer
-            == None  # カウントダウン時間が設定されている場合
+            and self.cool_time_timer != None  # カウントダウン時間が設定されている場合
             and time.time() - self.disable_set_time
             > self.cool_time_timer  # カウントダウン時間が経過した場合
         ):
