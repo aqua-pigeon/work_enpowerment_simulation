@@ -87,23 +87,19 @@ def main():
             status["bar_baristaNum"] = 1
             status["drip_meter"] = 5
 
-        if status["regi_baristaNum"] == 1 and regi2_button.check_button(
+        if  regi2_button.check_button(
             events
         ):  # regi2のボタンがクリックされた場合
             print("regi2_button clicked. time: ", int(status["elapsed_time"]))
 
-            if status["bar_baristaNum"] > 1:
-                status["bar_baristaNum"] -= 1
-                status["regi_baristaNum"] += 1
-            else:
-                status["regi_baristaNum"] += 1
+            status["regi_baristaNum"] = 2
+            status["bar_baristaNum"] = 1
 
-        if status["bar_baristaNum"] == 1 and bar_button.check_button(events):
-            if status["regi_baristaNum"] > 1:
-                status["regi_baristaNum"] -= 1
-                status["bar_baristaNum"] += 1
-            else:
-                status["bar_baristaNum"] += 1
+        if  bar_button.check_button(events):
+
+            status["regi_baristaNum"] = 1
+            status["is_reg2_free"]=False
+            status["bar_baristaNum"] = 2
 
         if menu_button.check_button(events):  # menuのボタンがクリックされた場合
             print("menu_button clicked. time: ", int(status["elapsed_time"]))
