@@ -19,6 +19,20 @@ pygame.init()  # Pygameの初期化
 def main():
     screen_instance = ScreenClass.Screen()  # screenClassのインスタンスを生成
 
+    # 被験者の名前を入力
+    name = input("被験者の名前を入力してください: ")
+    # シミュレーションの制限時間を取得
+    limit_time = int(os.getenv("SIMULATE_TIME"))
+    log_file_name = (
+        time.strftime("%Y%m%d_%H%M%S_", time.localtime()) + name + ".json"
+    )  # ログファイル名を生成
+    log.set_meta(
+        f"log/{log_file_name}",
+        name,
+        limit_time,
+        time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime()),
+    )  # メタデータを出力
+
     # button設定
     field_object_coordinates = screen_instance.field_object_coordinates
     # フィールドのオブジェクト座標を取得
@@ -36,9 +50,6 @@ def main():
     )  # regi2のボタンの設定
 
     start_time = time.time()  # ゲームの開始時間を記録
-    log_file_name = (
-        time.strftime("%Y%m%d_%H%M%S", time.localtime()) + ".json"
-    )  # ログファイル名を生成
     status = {
         "bar_baristaNum": 1,  # バーのバリスタの数
         "regi_baristaNum": 1,  # レジのバリスタの数
@@ -61,9 +72,6 @@ def main():
         "is_bar_free": True,  # バーが空いているか
         "elapsed_time": 0,  # 経過時間（秒）
         "regi_serviced_time": 0,  # 何人めのお客さんか
-        "os_cool_time": 0,  # osが作業に拘束される時間
-        "click_disabled": False,
-        "countdown_time": 5,
     }
 
     # ゲームループ
@@ -75,9 +83,11 @@ def main():
         log.dump_log("log/" + log_file_name, status)  # ログを出力
 
         for event in events:
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT:  # ウィンドウの×ボタンが押された場合
                 pygame.quit()
                 sys.exit()
+        if status["elapsed_time"] > limit_time:  # 制限時間を超えた場合
+            break  # ゲームを終了
 
         if drip_cofee_button.check_button(
             events
@@ -87,18 +97,14 @@ def main():
             status["bar_baristaNum"] = 1
             status["drip_meter"] = 5
 
-        if  regi2_button.check_button(
-            events
-        ):  # regi2のボタンがクリックされた場合
+        if regi2_button.check_button(events):  # regi2のボタンがクリックされた場合
             print("regi2_button clicked. time: ", int(status["elapsed_time"]))
-
             status["regi_baristaNum"] = 2
             status["bar_baristaNum"] = 1
 
-        if  bar_button.check_button(events):
-
+        if bar_button.check_button(events):  # barのボタンがクリックされた場合
             status["regi_baristaNum"] = 1
-            status["is_reg2_free"]=False
+            status["is_reg2_free"] = True
             status["bar_baristaNum"] = 2
 
         if menu_button.check_button(events):  # menuのボタンがクリックされた場合
