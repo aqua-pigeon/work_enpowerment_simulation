@@ -299,7 +299,7 @@ class Screen:
         img_width = 80
         img_height = 60
         img_people = ImgClass.Img(
-            "img/figure_standing.png", img_width, img_height
+            "img/coffee_cup_paper.png", img_width*3/4, img_height
         )  # 画像の読み込み
         bar_center_y = 275
         bar_x = 750

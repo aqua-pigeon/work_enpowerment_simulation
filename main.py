@@ -11,6 +11,7 @@ import utils.log as log
 import utils.regi as regi
 import utils.ScreenClass as ScreenClass
 
+
 pygame.init()  # Pygameの初期化
 
 
@@ -24,13 +25,13 @@ def main():
         field_object_coordinates["drip_coffee"], 6
     )  # ドリップコーヒーのボタンの設定
     regi2_button = Button.TimeLinkedButton(
-        field_object_coordinates["regi2"], 4
+        field_object_coordinates["regi2"], 6
     )  # regi2のボタンの設定
     menu_button = Button.TimeLinkedButton(
-        field_object_coordinates["menu"], 3
+        field_object_coordinates["menu"], 4
     )  # menuのボタンの設定
     bar_button = Button.TimeLinkedButton(
-        field_object_coordinates["bar"], 4
+        field_object_coordinates["bar"], 6
     )  # regi2のボタンの設定
 
     start_time = time.time()  # ゲームの開始時間を記録
@@ -62,6 +63,7 @@ def main():
         "os_cool_time": 0,  # osが作業に拘束される時間
         "click_disabled": False,
         "countdown_time": 5,
+        "click":0,
     }
 
     # ゲームループ
@@ -83,9 +85,12 @@ def main():
             events
         ):  # ドリップコーヒーのボタンがクリックされた場合
             # print("drip_coffee_button clicked. time: ", status["elapsed_time"])
+            status["is_reg2_free"] = True
             status["regi_baristaNum"] = 1
             status["bar_baristaNum"] = 1
+            status["drip_coffee"]+=1
             status["drip_meter"] = 5
+            status["click"]+=1
 
         if  regi2_button.check_button(
             events
@@ -94,19 +99,22 @@ def main():
 
             status["regi_baristaNum"] = 2
             status["bar_baristaNum"] = 1
+            status["click"] += 1
 
         if  bar_button.check_button(events):
 
+            status["is_reg2_free"] = True
             status["regi_baristaNum"] = 1
-            status["is_reg2_free"]=False
             status["bar_baristaNum"] = 2
+            status["click"] += 1
 
         if menu_button.check_button(events):  # menuのボタンがクリックされた場合
             print("menu_button clicked. time: ", status["elapsed_time"])
-
-            status["regi_baristaNum"] = 1
-            status["bar_baristaNum"] = 1
+            # status["is_reg2_free"] = True
+            # status["regi_baristaNum"] = 1
+            # status["bar_baristaNum"] = 1
             status["waiting_regi_unserviced"] -= 1
+            status["click"] += 1
 
         status = regi.regi_customer_arrive(status)  # お客さんの到着管理
         status = regi.regi_service(status)  # レジの接客管理
