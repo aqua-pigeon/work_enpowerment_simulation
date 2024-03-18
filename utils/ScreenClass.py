@@ -147,6 +147,7 @@ class Screen:
             (info_bar_width * 3, info_bar_height - 1),
             1,
         )
+
         # イメージアイコンを取得
         img_waiting_bar = ImgClass.Img(
             "img/figure_waiting.png", img_width * 2, img_height
@@ -173,6 +174,7 @@ class Screen:
             self.screen, info_bar_width * 3 + info_bar_height, info_bar_height / 2
         )
         img_menu.draw(self.screen, 110, 150)
+
         # テキストを描画
         self.draw_text(
             text="Countdown",
