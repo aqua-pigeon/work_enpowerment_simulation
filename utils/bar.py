@@ -25,5 +25,7 @@ def bar_service(status):
         status["is_bar_free"] = True  # バリスタが空いているか否かをTrueにする
         status["waiting_bar"] -= 1  # 待ち行列の人数を1減らす
         status["served"] += 1  # ドリンクを作成した人数を1増やす
+    if status["drip_meter"]==0:
+        status["bar_baristaNum"]=0
 
     return status

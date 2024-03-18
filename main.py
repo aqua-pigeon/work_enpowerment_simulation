@@ -73,6 +73,7 @@ def main():
         "is_bar_free": True,  # バーが空いているか
         "elapsed_time": 0,  # 経過時間（秒）
         "regi_serviced_time": 0,  # 何人めのお客さんか
+        "click":0,
     }
 
     # ゲームループ
