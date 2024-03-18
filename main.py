@@ -12,7 +12,6 @@ import utils.log as log
 import utils.regi as regi
 import utils.ScreenClass as ScreenClass
 
-
 load_dotenv()  # .envから環境変数を取得する。定数値の設定は別ファイルにしたほうが管理しやすいから
 pygame.init()  # Pygameの初期化
 
@@ -73,6 +72,7 @@ def main():
         "is_bar_free": True,  # バーが空いているか
         "elapsed_time": 0,  # 経過時間（秒）
         "regi_serviced_time": 0,  # 何人めのお客さんか
+        "click": 0,  # OSクリックの回数
     }
 
     # ゲームループ
@@ -97,9 +97,9 @@ def main():
             status["is_reg2_free"] = True
             status["regi_baristaNum"] = 1
             status["bar_baristaNum"] = 1
-            status["drip_coffee"]+=1
+            status["drip_coffee"] += 1
             status["drip_meter"] = 5
-            status["click"]+=1
+            status["click"] += 1
 
         if regi2_button.check_button(events):  # regi2のボタンがクリックされた場合
             print("regi2_button clicked. time: ", int(status["elapsed_time"]))
@@ -107,7 +107,7 @@ def main():
             status["bar_baristaNum"] = 1
             status["click"] += 1
 
-        if  bar_button.check_button(events):
+        if bar_button.check_button(events):
 
             status["is_reg2_free"] = True
             status["regi_baristaNum"] = 1
@@ -156,7 +156,10 @@ def main():
         if status["drip_baristaNum"] > 0:
             screen_instance.draw_drip_barista()  # ドリップの位置にバリスタを描画
         screen_instance.draw_regi_waitingPeople(
-            status["waiting_regi"], status["is_reg1_free"], status["is_reg2_free"]
+            status["waiting_regi"],
+            status["waiting_regi_unserviced"],
+            status["is_reg1_free"],
+            status["is_reg2_free"],
         )  # レジの待ち人数を描画
         screen_instance.draw_bar_waitingPeople(
             status["waiting_bar"]
