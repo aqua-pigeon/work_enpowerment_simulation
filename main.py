@@ -37,7 +37,8 @@ def main():
     field_object_coordinates = screen_instance.field_object_coordinates
     # フィールドのオブジェクト座標を取得
     drip_cofee_button = Button.TimeLinkedButton(
-        field_object_coordinates["drip_coffee"], int(os.getenv("DRIP_COFFEE_COOL_TIME"))
+        field_object_coordinates["drip_coffee"],
+        int(os.getenv("DRIP_COFFEE_COOL_TIME")),
     )  # ドリップコーヒーのボタンの設定
     regi2_button = Button.TimeLinkedButton(
         field_object_coordinates["regi2"], int(os.getenv("REGI_COOL_TIME"))
@@ -59,16 +60,15 @@ def main():
         "regi1_start_time": 0,  # 接客開始時間
         "regi2_start_time": 0,  # 接客開始時間
         "bar_start_time": 0,  # ドリンク作成開始時間
-        "waiting_regi": 0,  # 待ち行列の人数
-        "waiting_regi_unserviced": 0,  # メニューを渡されてない人
+        "waiting_regi_queue": [],  # 待ち行列の人数
         "waiting_bar": 0,  # 待ち行列の人数
         "served": 0,  # サービスされた人数=作成されたドリンクの数
-        "drip_coffee": 0,  # ドリップコーヒーの補充回数
+        "drip_coffee_sup_count": 0,  # ドリップコーヒーの補充回数
         "drip_meter": 5,  # ドリップの残量
         "arrive_1_flag": True,  # 到着を受理していいか否か
         "arrive_2_flag": True,  # 到着を受理していいか否か
-        "is_reg1_free": True,  # レジ1が空いているか
-        "is_reg2_free": True,  # レジ2が空いているか
+        "regi1_customer": 0,  # レジ1が空いている=0, 1or2=空いていない
+        "regi2_customer": 0,  # レジ2が空いている=0, 1or2=空いていない
         "is_bar_free": True,  # バーが空いているか
         "elapsed_time": 0,  # 経過時間（秒）
         "regi_serviced_time": 0,  # 何人めのお客さんか
@@ -94,10 +94,12 @@ def main():
             events
         ):  # ドリップコーヒーのボタンがクリックされた場合
             # print("drip_coffee_button clicked. time: ", status["elapsed_time"])
-            status["is_reg2_free"] = True
+            if status["regi2_customer"] != 0:
+                status["waiting_regi_queue"].insert(0, status["regi2_customer"])
+                status["regi2_customer"] = 0
             status["regi_baristaNum"] = 1
             status["bar_baristaNum"] = 1
-            status["drip_coffee"] += 1
+            status["drip_coffee_sup_count"] += 1
             status["drip_meter"] = 5
             status["click"] += 1
 
@@ -108,18 +110,24 @@ def main():
             status["click"] += 1
 
         if bar_button.check_button(events):
-
-            status["is_reg2_free"] = True
+            if status["regi2_customer"] != 0:
+                status["waiting_regi_queue"].insert(0, status["regi2_customer"])
+                status["regi2_customer"] = 0
             status["regi_baristaNum"] = 1
             status["bar_baristaNum"] = 2
             status["click"] += 1
 
         if menu_button.check_button(events):  # menuのボタンがクリックされた場合
             print("menu_button clicked. time: ", status["elapsed_time"])
-            # status["is_reg2_free"] = True
-            # status["regi_baristaNum"] = 1
-            # status["bar_baristaNum"] = 1
-            status["waiting_regi_unserviced"] -= 1
+            if status["regi2_customer"] != 0:
+                status["waiting_regi_queue"].insert(0, status["regi2_customer"])
+                status["regi2_customer"] = 0
+            status["regi_baristaNum"] = 1
+            status["bar_baristaNum"] = 1
+            for i in range(len(status["waiting_regi_queue"])):
+                if status["waiting_regi_queue"][i] < 3:
+                    status["waiting_regi_queue"][i] += 3
+                    break
             status["click"] += 1
 
         status = regi.regi_customer_arrive(status)  # お客さんの到着管理
@@ -132,10 +140,10 @@ def main():
         screen_instance.draw_field()  # フィールドを描画
         screen_instance.draw_info_bar_frame()  # インフォメーションバーの静的コンテンツを描画
         screen_instance.draw_info_bar_value(
-            status["waiting_regi"],
+            len(status["waiting_regi_queue"]),
             status["waiting_bar"],
             status["served"],
-            status["drip_coffee"],
+            status["drip_coffee_sup_count"],
         )  # インフォメーションバーの動的コンテンツを描画
 
         screen_instance.draw_cool_time(  # クールタイムを描画
@@ -155,12 +163,7 @@ def main():
             screen_instance.draw_bar_barista(barista_num=2)  # バー2のバリスタを描画
         if status["drip_baristaNum"] > 0:
             screen_instance.draw_drip_barista()  # ドリップの位置にバリスタを描画
-        screen_instance.draw_regi_waitingPeople(
-            status["waiting_regi"],
-            status["waiting_regi_unserviced"],
-            status["is_reg1_free"],
-            status["is_reg2_free"],
-        )  # レジの待ち人数を描画
+        screen_instance.draw_regi_waitingPeople(status)  # レジの待ち人数を描画
         screen_instance.draw_bar_waitingPeople(
             status["waiting_bar"]
         )  # バーの待ち人数を描画

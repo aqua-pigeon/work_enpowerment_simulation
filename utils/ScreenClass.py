@@ -264,9 +264,7 @@ class Screen:
             color=BLACK,
         )
 
-    def draw_regi_waitingPeople(
-        self, waitingNum, waitingNumUnserved, is_reg1_free, is_reg2_free
-    ):
+    def draw_regi_waitingPeople(self, status):
         img_width = 80
         img_height = 60
         img_people = ImgClass.Img(
@@ -274,6 +272,9 @@ class Screen:
         )  # 画像の読み込み
         img_people_served = ImgClass.Img(
             "img/figure_standing_served.png", img_width, img_height
+        )  # 画像の読み込み
+        img_people_double = ImgClass.Img(
+            "img/figure_standing_2.png", img_width, img_height
         )  # 画像の読み込み
         regi_x_1 = 290
         rigi_x_2 = 390
@@ -283,29 +284,45 @@ class Screen:
         queue_y_offset = 40
         queue_y_length = 100
         queue_y_end = regi_y - queue_y_offset
+        queue_y_start = queue_y_end - queue_y_length
 
-        served_num = waitingNum - waitingNumUnserved
-        if is_reg1_free == False:
-            if waitingNumUnserved > 0:
-                img_people.draw(self.screen, regi_x_1, regi_y - regi_y_offset)
-            elif served_num > 0:
-                img_people_served.draw(self.screen, regi_x_1, regi_y - regi_y_offset)
-                served_num -= 1
-        if is_reg2_free == False:
-            if waitingNumUnserved > 1:
-                img_people.draw(self.screen, rigi_x_2, regi_y - regi_y_offset)
-            elif served_num > 1:
-                img_people_served.draw(self.screen, rigi_x_2, regi_y - regi_y_offset)
-                served_num -= 1
+        # 0=いない,1=普通の人,2=VIP,3=メニューを持った普通の人,4=メニューを持ったVIP
+        regi1_customer_type = status["regi1_customer"]
+        regi2_customer_type = status["regi2_customer"]
+        if regi1_customer_type == 1:  # 1=普通の人
+            img_people.draw(self.screen, regi_x_1, regi_y - regi_y_offset)
+        elif regi1_customer_type == 2:  # 2=VIP
+            img_people_double.draw(self.screen, regi_x_1, regi_y - regi_y_offset)
+        elif regi1_customer_type == 4:  # 3=メニューを持った普通の人
+            img_people_served.draw(self.screen, regi_x_1, regi_y - regi_y_offset)
+        elif regi1_customer_type == 5:  # 4=メニューを持ったVIP
+            img_people_served.draw(self.screen, regi_x_1, regi_y - regi_y_offset)
 
-        regi_queue_length = waitingNum - 2 + is_reg1_free + is_reg2_free
-        if regi_queue_length > 0:
-            for i in range(regi_queue_length - 1, -1, -1):
-                queue_y = queue_y_end - queue_y_length / waitingNum * i
-                if i < regi_queue_length - served_num:
-                    img_people.draw(self.screen, regi_x_center, queue_y)
-                else:
-                    img_people_served.draw(self.screen, regi_x_center, queue_y)
+        if regi2_customer_type == 0:
+            pass
+        elif regi2_customer_type == 1:  # 1=普通の人
+            img_people.draw(self.screen, rigi_x_2, regi_y - regi_y_offset)
+        elif regi2_customer_type == 2:  # 2=VIP
+            img_people_double.draw(self.screen, rigi_x_2, regi_y - regi_y_offset)
+        elif regi2_customer_type == 4:  # 3=メニューを持った普通の人
+            img_people_served.draw(self.screen, rigi_x_2, regi_y - regi_y_offset)
+        elif regi2_customer_type == 5:  # 4=メニューを持ったVIP
+            img_people_served.draw(self.screen, rigi_x_2, regi_y - regi_y_offset)
+
+        queue_len = len(status["waiting_regi_queue"])
+        for index in range(len(status["waiting_regi_queue"])):  # 待ち行列の描画
+            i = status["waiting_regi_queue"][queue_len - index - 1]
+            queue_y = queue_y_end - queue_y_length / len(
+                status["waiting_regi_queue"]
+            ) * (queue_len - index)
+            if i == 1:
+                img_people.draw(self.screen, regi_x_center, queue_y)
+            elif i == 2:
+                img_people_double.draw(self.screen, regi_x_center, queue_y)
+            elif i == 4:
+                img_people_served.draw(self.screen, regi_x_center, queue_y)
+            elif i == 5:
+                img_people_served.draw(self.screen, regi_x_center, queue_y)
 
     def draw_bar_waitingPeople(self, waitingNum):
         img_width = 80
