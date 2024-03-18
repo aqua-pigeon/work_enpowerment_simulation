@@ -147,6 +147,7 @@ class Screen:
             (info_bar_width * 3, info_bar_height - 1),
             1,
         )
+
         # イメージアイコンを取得
         img_waiting_bar = ImgClass.Img(
             "img/figure_waiting.png", img_width * 2, img_height
@@ -173,6 +174,7 @@ class Screen:
             self.screen, info_bar_width * 3 + info_bar_height, info_bar_height / 2
         )
         img_menu.draw(self.screen, 110, 150)
+
         # テキストを描画
         self.draw_text(
             text="Countdown",
@@ -264,16 +266,11 @@ class Screen:
             color=BLACK,
         )
 
-    def draw_regi_waitingPeople(
-        self, waitingNum, waitingNumUnserved, is_reg1_free, is_reg2_free
-    ):
+    def draw_regi_waitingPeople(self, waitingNum, is_reg1_free, is_reg2_free):
         img_width = 80
         img_height = 60
         img_people = ImgClass.Img(
             "img/figure_standing.png", img_width, img_height
-        )  # 画像の読み込み
-        img_people_served = ImgClass.Img(
-            "img/figure_standing_served.png", img_width, img_height
         )  # 画像の読み込み
         regi_x_1 = 290
         rigi_x_2 = 390
@@ -283,29 +280,43 @@ class Screen:
         queue_y_offset = 40
         queue_y_length = 100
         queue_y_end = regi_y - queue_y_offset
-
-        served_num = waitingNum - waitingNumUnserved
         if is_reg1_free == False:
-            if waitingNumUnserved > 0:
-                img_people.draw(self.screen, regi_x_1, regi_y - regi_y_offset)
-            elif served_num > 0:
-                img_people_served.draw(self.screen, regi_x_1, regi_y - regi_y_offset)
-                served_num -= 1
+            img_people.draw(self.screen, regi_x_1, regi_y - regi_y_offset)
         if is_reg2_free == False:
-            if waitingNumUnserved > 1:
-                img_people.draw(self.screen, rigi_x_2, regi_y - regi_y_offset)
-            elif served_num > 1:
-                img_people_served.draw(self.screen, rigi_x_2, regi_y - regi_y_offset)
-                served_num -= 1
-
+            img_people.draw(self.screen, rigi_x_2, regi_y - regi_y_offset)
         regi_queue_length = waitingNum - 2 + is_reg1_free + is_reg2_free
         if regi_queue_length > 0:
             for i in range(regi_queue_length - 1, -1, -1):
                 queue_y = queue_y_end - queue_y_length / waitingNum * i
-                if i < regi_queue_length - served_num:
-                    img_people.draw(self.screen, regi_x_center, queue_y)
-                else:
-                    img_people_served.draw(self.screen, regi_x_center, queue_y)
+                img_people.draw(self.screen, regi_x_center, queue_y)
+
+    def draw_menued_people(self, waiting_regi, menued, is_reg1_free, is_reg2_free):
+        img_width = 80
+        img_height = 60
+        menu_x_1 = 295
+        menu_x_2 = 395
+        menu_x_center = (menu_x_1 + menu_x_2) // 2
+        menu_y = 300
+        menu_y_offset = 20
+        menuqueue_y_offset = 40
+        menuqueue_y_length = 100
+        menuqueue_y_end = menu_y - menuqueue_y_offset
+
+        img_menued = ImgClass.Img(
+            "img/menued.png", img_width*2/5 , img_height
+        )  # 画像の読み込み
+        menuqueue_y_end = menu_y - menuqueue_y_offset
+        
+        if menued == True :    
+            if is_reg1_free == False:
+                img_menued.draw(self.screen, menu_x_1, menu_y - menu_y_offset,)
+            if is_reg2_free == False:
+                img_menued.draw(self.screen, menu_x_2, menu_y - menu_y_offset)
+            menu_queue_length = waiting_regi - 2 + is_reg1_free + is_reg2_free
+            if menu_queue_length > 0:
+                for i in range(menu_queue_length - 1, -1, -1):
+                    menuqueue_y = menuqueue_y_end - menuqueue_y_length / waiting_regi * i
+                    img_menued.draw(self.screen, menu_x_center, menuqueue_y)
 
     def draw_bar_waitingPeople(self, waitingNum):
         img_width = 80
