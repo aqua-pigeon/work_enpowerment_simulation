@@ -7,9 +7,21 @@
 ## 実験環境構築
 
 1. 本リポジトリを任意の場所にcloneする
+   ```sh
+   git clone https://github.com/Aquamana06/work_enpowerment_simulation.git
+   ```
 2. cloneしたリポジトリに移動
+   ```sh
+   cd work_enpowerment_simulation/
+   ```
 3. ライブラリをインストール
+   ```sh
+   pip install -r requirements.txt
+   ```
 4. 実行
+   ```sh
+   python main.py
+   ```
 
 ## Git 操作メモ
 
