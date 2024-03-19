@@ -73,7 +73,7 @@ def main():
         "elapsed_time": 0,  # 経過時間（秒）
         "regi_serviced_time": 0,  # 何人めのお客さんか
         "click": 0,  # OSクリックの回数
-        "menued": False,
+        "menued": 0,
     }
 
     # ゲームループ
@@ -130,7 +130,7 @@ def main():
                     status["waiting_regi_queue"][i] += 3
                     break
             status["click"] += 1
-            status["menued"] == True
+            status["menued"] +=1
 
         status = regi.regi_customer_arrive(status)  # お客さんの到着管理
         status = regi.regi_service(status)  # レジの接客管理
