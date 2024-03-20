@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 import utils.bar as bar
 import utils.Button as Button
 import utils.drip as drip
+import utils.get_api_token as get_api_token
 import utils.log as log
 import utils.regi as regi
 import utils.ScreenClass as ScreenClass
@@ -34,7 +35,7 @@ def main():
     )  # slackにログファイルをアップロードするかどうか
 
     # 環境変数にslackのAPIトークンが設定されていない場合は終了
-    if os.getenv("SLACK_API_TOKEN") == "yourAPItoken":
+    if get_api_token.get_slack_api_token() == "":
         print("SLACK_API_TOKENが設定されていません。")
         sys.exit(1)
 
@@ -198,7 +199,9 @@ def main():
         with open(log_file_path, "rb") as file:
             response = requests.post(
                 url="https://slack.com/api/files.upload",
-                headers={"Authorization": f"Bearer {os.getenv('SLACK_API_TOKEN')}"},
+                headers={
+                    "Authorization": f"Bearer {get_api_token.get_slack_api_token()}"
+                },
                 data={"channels": os.getenv("SLACK_CHANNEL")},
                 files={"file": file},
             )
