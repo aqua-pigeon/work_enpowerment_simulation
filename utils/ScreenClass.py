@@ -15,6 +15,7 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 BROWN = (165, 42, 42)
+CREAM =(255, 238, 205)
 
 
 class Screen:
@@ -37,7 +38,7 @@ class Screen:
         pygame.time.Clock().tick(30)  # FPSを30に設定
 
     def clear(self):
-        self.screen.fill(WHITE)
+        self.screen.fill(CREAM)
 
     def draw_text(self, text, x, y, font_size=40, color=BLACK):
         # フォントの設定
@@ -273,11 +274,15 @@ class Screen:
             "img/figure_standing.png", img_width, img_height
         )  # 画像の読み込み
         img_people_served = ImgClass.Img(
-            "img/figure_standing_served.png", img_width, img_height
+            "img/serverd.png", img_width, img_height
         )  # 画像の読み込み
         img_people_double = ImgClass.Img(
-            "img/figure_standing_2.png", img_width, img_height
+            "img/figure_talking.png", img_width, img_height
         )  # 画像の読み込み
+        img_people_served_double = ImgClass.Img(
+            "img/serverd_double.png", img_width, img_height
+        )  # 画像の読み込み
+
         regi_x_1 = 290
         rigi_x_2 = 390
         regi_x_center = (regi_x_1 + rigi_x_2) // 2
@@ -298,7 +303,7 @@ class Screen:
         elif regi1_customer_type == 4:  # 3=メニューを持った普通の人
             img_people_served.draw(self.screen, regi_x_1, regi_y - regi_y_offset)
         elif regi1_customer_type == 5:  # 4=メニューを持ったVIP
-            img_people_served.draw(self.screen, regi_x_1, regi_y - regi_y_offset)
+            img_people_served_double.draw(self.screen, regi_x_1, regi_y - regi_y_offset)
 
         if regi2_customer_type == 0:
             pass
@@ -309,7 +314,7 @@ class Screen:
         elif regi2_customer_type == 4:  # 3=メニューを持った普通の人
             img_people_served.draw(self.screen, rigi_x_2, regi_y - regi_y_offset)
         elif regi2_customer_type == 5:  # 4=メニューを持ったVIP
-            img_people_served.draw(self.screen, rigi_x_2, regi_y - regi_y_offset)
+            img_people_served_double.draw(self.screen, rigi_x_2, regi_y - regi_y_offset)
 
         queue_len = len(status["waiting_regi_queue"])
         for index in range(len(status["waiting_regi_queue"])):  # 待ち行列の描画
@@ -324,7 +329,7 @@ class Screen:
             elif i == 4:
                 img_people_served.draw(self.screen, regi_x_center, queue_y)
             elif i == 5:
-                img_people_served.draw(self.screen, regi_x_center, queue_y)
+                img_people_served_double.draw(self.screen, regi_x_center, queue_y)
 
     def draw_bar_waitingPeople(self, waitingNum):
         img_width = 80
@@ -332,8 +337,8 @@ class Screen:
         img_people = ImgClass.Img(
             "img/coffee_cup_paper.png", img_width * 3 / 4, img_height
         )  # 画像の読み込み
-        bar_center_y = 275
-        bar_x = 750
+        bar_center_y = 450
+        bar_x = 800
         queue_x_length = 200
         for i in range(waitingNum - 1, -1, -1):
             queue_x = bar_x - queue_x_length / waitingNum * i
