@@ -18,13 +18,20 @@
    ```sh
    pip install -r requirements.txt
    ```
-4. API トークンを設定
+4. ファイルを作成
+   utils フォルダの中に**get_api_token.py**という名前のファイルを作成  
+   ファイルの中身は以下をコピペ
+   ```python
+   def get_slack_api_token():
+     return ""  # ここにトークンを入れる
+   ```
+5. API トークンを設定
    - utils/get_api_token.py の""に API トークンをペースト
    - API トークンは実験者から直接配布される
    ```python
-    API_TOKEN = ""  ## ここにAPIトークンを入力
+    return ""  # ここにトークンを入れる
    ```
-5. 実行  
+6. 実行  
    デモ
    ```sh
    python main.py demo
