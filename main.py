@@ -9,7 +9,7 @@ import utils.bar as bar
 import utils.Button as Button
 import utils.drip as drip
 import utils.log as log
-import utils.regi as regi
+
 import utils.ScreenClass as ScreenClass
 
 load_dotenv()  # .envから環境変数を取得する。定数値の設定は別ファイルにしたほうが管理しやすいから
