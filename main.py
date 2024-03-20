@@ -123,14 +123,14 @@ def main():
             if status["regi2_customer"] != 0:
                 status["waiting_regi_queue"].insert(0, status["regi2_customer"])
                 status["regi2_customer"] = 0
-            status["regi_baristaNum"] = 1
-            status["bar_baristaNum"] = 1
+                status["regi_baristaNum"] = 1
+                status["bar_baristaNum"] = 1
             for i in range(len(status["waiting_regi_queue"])):
                 if status["waiting_regi_queue"][i] < 3:
                     status["waiting_regi_queue"][i] += 3
                     break
             status["click"] += 1
-            status["menued"] +=1
+            status["menued"] += 1
 
         status = regi.regi_customer_arrive(status)  # お客さんの到着管理
         status = regi.regi_service(status)  # レジの接客管理
@@ -142,7 +142,7 @@ def main():
         screen_instance.draw_field()  # フィールドを描画
         screen_instance.draw_info_bar_frame()  # インフォメーションバーの静的コンテンツを描画
         screen_instance.draw_info_bar_value(
-            len(status["waiting_regi_queue"]),
+            regi.get_waiting_regi_num(status["waiting_regi_queue"]),
             status["waiting_bar"],
             status["served"],
             status["drip_coffee_sup_count"],

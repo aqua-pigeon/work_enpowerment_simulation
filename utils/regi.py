@@ -43,14 +43,18 @@ def regi_service(status):
     if status["regi1_customer"] == 0:
         if queue_length > 0:
             status["regi1_customer"] = status["waiting_regi_queue"].pop(0)
-            if status["regi1_customer"] == 0 or status["regi1_customer"] == 1 or status["regi1_customer"] == 2:
+            if (
+                status["regi1_customer"] == 0
+                or status["regi1_customer"] == 1
+                or status["regi1_customer"] == 2
+            ):
                 status["regi1_time"] = REGI_SERVICE_BASE_TIME * (
                     status["regi1_customer"] % 3
                 )
             else:
                 status["regi1_time"] = REGI_SERVICE_BASE_TIME * (
-                    status["regi1_customer"] % 3 * (8/10)
-            )
+                    status["regi1_customer"] % 3 * (5 / 10)
+                )
             status["regi1_start_time"] = time.time()
 
     if (
@@ -75,7 +79,7 @@ def regi_service(status):
                 )
             else:
                 status["regi2_time"] = REGI_SERVICE_BASE_TIME * (
-                    status["regi2_customer"] % 3 *(8 / 10)
+                    status["regi2_customer"] % 3 * (5 / 10)
                 )
             status["regi2_start_time"] = time.time()
 
@@ -88,3 +92,10 @@ def regi_service(status):
             status["regi2_customer"] = 0
 
     return status
+
+
+def get_waiting_regi_num(waiting_regi_queue):
+    result = 0
+    for i in waiting_regi_queue:
+        result += i % 3
+    return result
