@@ -6,11 +6,11 @@
 
 ## 実験環境構築
 
-1. 本リポジトリを任意の場所にcloneする
+1. 本リポジトリを任意の場所に clone する
    ```sh
    git clone https://github.com/Aquamana06/work_enpowerment_simulation.git
    ```
-2. cloneしたリポジトリに移動
+2. clone したリポジトリに移動
    ```sh
    cd work_enpowerment_simulation/
    ```
@@ -18,7 +18,13 @@
    ```sh
    pip install -r requirements.txt
    ```
-4. 実行
+4. API トークンを設定
+   - utils/get_api_token.py の""に API トークンをペースト
+   - API トークンは実験者から直接配布される
+   ```python
+    API_TOKEN = ""  ## ここにAPIトークンを入力
+   ```
+5. 実行
    ```sh
    python main.py
    ```

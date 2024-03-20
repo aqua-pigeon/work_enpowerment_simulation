@@ -3,11 +3,13 @@ import sys
 import time
 
 import pygame
+import requests
 from dotenv import load_dotenv
 
 import utils.bar as bar
 import utils.Button as Button
 import utils.drip as drip
+import utils.get_api_token as get_api_token
 import utils.log as log
 
 import utils.ScreenClass as ScreenClass
@@ -17,17 +19,36 @@ pygame.init()  # Pygameの初期化
 
 
 def main():
+    # コマンドライン引数を受け取る
+    if len(sys.argv) != 2:
+        print("Usage: python main.py <simulation type (test or demo).>")
+        sys.exit(1)
+    if sys.argv[1] == "test":
+        limit_time = int(os.getenv("SIMULATE_TIME"))  # シミュレーションの制限時間を取得
+    elif sys.argv[1] == "demo":
+        limit_time = int(os.getenv("DEMO_TIME"))  # シミュレーションの制限時間を取得
+    else:
+        print("Usage: python main.py <simulation type (test or demo).>")
+        sys.exit(1)
+    file_upload = (
+        os.getenv("SLACK_UPLOAD") == "True" and sys.argv[1] == "test"
+    )  # slackにログファイルをアップロードするかどうか
+
+    # 環境変数にslackのAPIトークンが設定されていない場合は終了
+    if get_api_token.get_slack_api_token() == "":
+        print("SLACK_API_TOKENが設定されていません。")
+        sys.exit(1)
+
     screen_instance = ScreenClass.Screen()  # screenClassのインスタンスを生成
 
     # 被験者の名前を入力
     name = input("被験者の名前を入力してください: ")
-    # シミュレーションの制限時間を取得
-    limit_time = int(os.getenv("SIMULATE_TIME"))
-    log_file_name = (
-        time.strftime("%Y%m%d_%H%M%S_", time.localtime()) + name + ".json"
+
+    log_file_path = (
+        f"log/" + time.strftime("%Y%m%d_%H%M%S_", time.localtime()) + name + ".json"
     )  # ログファイル名を生成
     log.set_meta(
-        f"log/{log_file_name}",
+        log_file_path,
         name,
         limit_time,
         time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime()),
@@ -82,12 +103,11 @@ def main():
     while running:
         status["elapsed_time"] = time.time() - start_time  # 経過時間を計算（秒）
         events = pygame.event.get()  # pygame画面でのイベントを取得
-        log.dump_log("log/" + log_file_name, status)  # ログを出力
+        log.dump_log(log_file_path, status)  # ログを出力
 
         for event in events:
             if event.type == pygame.QUIT:  # ウィンドウの×ボタンが押された場合
                 pygame.quit()
-                sys.exit()
         if status["elapsed_time"] > limit_time:  # 制限時間を超えた場合
             break  # ゲームを終了
 
@@ -172,6 +192,25 @@ def main():
         screen_instance.draw_drip_meter(status["drip_meter"])  # ドリップの残量を描画
 
         pygame.display.flip()  # 画面を更新
+
+    # ゲーム終了後の処理
+    if file_upload:
+        # logファイルを開いてslackにアップロード
+        with open(log_file_path, "rb") as file:
+            response = requests.post(
+                url="https://slack.com/api/files.upload",
+                headers={
+                    "Authorization": f"Bearer {get_api_token.get_slack_api_token()}"
+                },
+                data={"channels": os.getenv("SLACK_CHANNEL")},
+                files={"file": file},
+            )
+        if response.json()["ok"] is not True:
+            print("logファイルのアップロードに失敗しました")
+            print(response.json())
+            sys.exit(1)
+        print("logファイルをアップロードしました。")
+    print("実験お疲れ様でした。")
 
 
 if __name__ == "__main__":
