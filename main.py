@@ -9,10 +9,8 @@ from dotenv import load_dotenv
 import utils.bar as bar
 import utils.Button as Button
 import utils.drip as drip
-import utils.get_api_token as get_api_token
 import utils.log as log
 import utils.regi as regi
-
 import utils.ScreenClass as ScreenClass
 
 load_dotenv()  # .envから環境変数を取得する。定数値の設定は別ファイルにしたほうが管理しやすいから
@@ -21,23 +19,27 @@ pygame.init()  # Pygameの初期化
 
 def main():
     # コマンドライン引数を受け取る
-    if len(sys.argv) != 2:
-        print("Usage: python main.py <simulation type (test or demo).>")
+    if len(sys.argv) != 3:
+        print(
+            "使い方: python main.py <シミュレーションタイプ (test か demo).> <APIトークン>"
+        )
         sys.exit(1)
     if sys.argv[1] == "test":
         limit_time = int(os.getenv("SIMULATE_TIME"))  # シミュレーションの制限時間を取得
     elif sys.argv[1] == "demo":
         limit_time = int(os.getenv("DEMO_TIME"))  # シミュレーションの制限時間を取得
     else:
-        print("Usage: python main.py <simulation type (test or demo).>")
-        sys.exit(1)
+        print(
+            "使い方: python main.py <シミュレーションタイプ (test か demo).> <APIトークン>"
+        )
+
     file_upload = (
         os.getenv("SLACK_UPLOAD") == "True" and sys.argv[1] == "test"
     )  # slackにログファイルをアップロードするかどうか
 
-    # 環境変数にslackのAPIトークンが設定されていない場合は終了
-    if get_api_token.get_slack_api_token() == "":
-        print("SLACK_API_TOKENが設定されていません。")
+    # APIトークンがxoxbから始まるかどうかをチェック
+    if sys.argv[2] == "xoxb-":
+        print("APIトークンが不正です。")
         sys.exit(1)
 
     screen_instance = ScreenClass.Screen()  # screenClassのインスタンスを生成
@@ -200,9 +202,7 @@ def main():
         with open(log_file_path, "rb") as file:
             response = requests.post(
                 url="https://slack.com/api/files.upload",
-                headers={
-                    "Authorization": f"Bearer {get_api_token.get_slack_api_token()}"
-                },
+                headers={"Authorization": f"Bearer {sys.argv[2]}"},
                 data={"channels": os.getenv("SLACK_CHANNEL")},
                 files={"file": file},
             )
