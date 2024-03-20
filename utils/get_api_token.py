@@ -1,2 +1,2 @@
 def get_slack_api_token():
-    return ""
+    return ""  # ここにトークンを入れる
