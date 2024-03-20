@@ -24,9 +24,14 @@
    ```python
     API_TOKEN = ""  ## ここにAPIトークンを入力
    ```
-5. 実行
+5. 実行  
+   デモ
    ```sh
-   python main.py
+   python main.py demo
+   ```
+   本番
+   ```sh
+   python main.py test
    ```
 
 ## Git 操作メモ

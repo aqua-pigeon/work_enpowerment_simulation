@@ -11,6 +11,7 @@ import utils.Button as Button
 import utils.drip as drip
 import utils.get_api_token as get_api_token
 import utils.log as log
+import utils.regi as regi
 
 import utils.ScreenClass as ScreenClass
 
