@@ -33,6 +33,11 @@ def main():
         os.getenv("SLACK_UPLOAD") == "True" and sys.argv[1] == "test"
     )  # slackにログファイルをアップロードするかどうか
 
+    # 環境変数にslackのAPIトークンが設定されていない場合は終了
+    if os.getenv("SLACK_API_TOKEN") == "yourAPItoken":
+        print("SLACK_API_TOKENが設定されていません。")
+        sys.exit(1)
+
     screen_instance = ScreenClass.Screen()  # screenClassのインスタンスを生成
 
     # 被験者の名前を入力
