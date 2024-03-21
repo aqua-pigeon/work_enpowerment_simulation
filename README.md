@@ -6,7 +6,7 @@
 
 ## 実験環境構築
 
-1. 本リポジトリを任意の場所に clone する
+1. ターミナルを開き、本リポジトリを任意の場所に clone する
    ```sh
    git clone https://github.com/Aquamana06/work_enpowerment_simulation.git
    ```
