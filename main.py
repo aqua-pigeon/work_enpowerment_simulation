@@ -146,8 +146,8 @@ def main():
             if status["regi2_customer"] != 0:
                 status["waiting_regi_queue"].insert(0, status["regi2_customer"])
                 status["regi2_customer"] = 0
-                status["regi_baristaNum"] = 1
-                status["bar_baristaNum"] = 1
+            status["regi_baristaNum"] = 1
+            status["bar_baristaNum"] = 1
             for i in range(len(status["waiting_regi_queue"])):
                 if status["waiting_regi_queue"][i] < 3:
                     status["waiting_regi_queue"][i] += 3
