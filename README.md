@@ -10,14 +10,20 @@
    ```sh
    git clone https://github.com/Aquamana06/work_enpowerment_simulation.git
    ```
-   - 「**Gitは内部コマンドまたは外部コマンド、操作可能なプログラムまたはバッチファイルとして認識されていません**」とでた場合、以下のどちらかを実行
+   <details>
+      
+      <summary>「Gitは内部コマンドまたは外部コマンド、操作可能なプログラムまたはバッチファイルとして認識されていません」とでた場合</summary>
+      
+      ### 以下のどちらかを実行
       - GitがPCにインストールされていないのでGitをインストール
          - [インストール方法 for Windows](https://qiita.com/T-H9703EnAc/items/4fbe6593d42f9a844b1c)
          - もう一度、手順1からやり直す（git cloneをする）
       - プログラムを直接ダウンロード
          - 以下の画像のように、画面上部の緑色「code」を押し、「Download ZIP」からプログラムをダウンロード
          - この方法の場合は、手順1を修了し、手順2「clone したリポジトリに移動」から再開
-         - <img width="917" alt="Screenshot 2024-03-21 at 11 00 16" src="https://github.com/Aquamana06/work_enpowerment_simulation/assets/42343541/76e961b2-6dc1-4f15-8fd7-8d4997320938">
+        <img width="917" alt="Screenshot 2024-03-21 at 11 00 16" src="https://github.com/Aquamana06/work_enpowerment_simulation/assets/42343541/76e961b2-6dc1-4f15-8fd7-8d4997320938">
+         
+   </details>
 
 
 2. clone したリポジトリに移動
