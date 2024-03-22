@@ -200,8 +200,9 @@ def main():
 
     # ゲーム終了後の処理
     screen_instance.quit()  # Pygameを終了. 画面収録を終了
-    webbrowser.open(os.getenv("QUESTIONNAIRE_URL"))  # アンケートページを開く
+    log.dump_result(log_file_name + ".json", status)  # 結果を出力
     if file_upload:
+        webbrowser.open(os.getenv("QUESTIONNAIRE_URL"))  # アンケートページを開く
         # logファイルを開いてslackにアップロード
         with open(log_file_name + ".json", "rb") as file:
             response = requests.post(
