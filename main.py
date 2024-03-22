@@ -6,6 +6,7 @@ import webbrowser
 import pygame
 import requests
 from dotenv import load_dotenv
+
 import utils.bar as bar
 import utils.Button as Button
 import utils.drip as drip
@@ -88,15 +89,15 @@ def main():
         "regi1_start_time": 0,  # 接客開始時間
         "regi2_start_time": 0,  # 接客開始時間
         "bar_start_time": 0,  # ドリンク作成開始時間
-        "waiting_regi_queue": [],  # 待ち行列の人数
-        "waiting_bar": 0,  # 待ち行列の人数
-        "served": 0,  # サービスされた人数=作成されたドリンクの数
+        "waiting_regi_queue": [],  # regi待ち行列
+        "waiting_bar_queue": [],  # bar待ち行列
+        "served": [],  # サービスされたお客さん
         "drip_coffee_sup_count": 0,  # ドリップコーヒーの補充回数
         "drip_meter": 5,  # ドリップの残量
         "arrive_1_flag": True,  # 到着を受理していいか否か
         "arrive_2_flag": True,  # 到着を受理していいか否か
-        "regi1_customer": 0,  # レジ1が空いている=0, 1or2=空いていない
-        "regi2_customer": 0,  # レジ2が空いている=0, 1or2=空いていない
+        "regi1_customer": None,  # レジ1が空いている=None
+        "regi2_customer": None,  # レジ2が空いている=None
         "is_bar_free": True,  # バーが空いているか
         "elapsed_time": 0,  # 経過時間（秒）
         "regi_serviced_time": 0,  # 何人めのお客さんか
@@ -115,45 +116,44 @@ def main():
 
         for event in events:
             if event.type == pygame.QUIT:  # ウィンドウの×ボタンが押された場合
-                break  # ゲームを終了
+                running = False  # ゲームを終了
+                break
         if status["elapsed_time"] > limit_time:  # 制限時間を超えた場合
             break  # ゲームを終了
         if drip_cofee_button.check_button(
             events
         ):  # ドリップコーヒーのボタンがクリックされた場合
             # print("drip_coffee_button clicked. time: ", status["elapsed_time"])
-            if status["regi2_customer"] != 0:
+            if status["regi2_customer"] != None:
                 status["waiting_regi_queue"].insert(0, status["regi2_customer"])
-                status["regi2_customer"] = 0
+                status["regi2_customer"] = None
             status["regi_baristaNum"] = 1
             status["bar_baristaNum"] = 1
             status["drip_coffee_sup_count"] += 1
             status["drip_meter"] = 5
             status["click"] += 1
         if regi2_button.check_button(events):  # regi2のボタンがクリックされた場合
-            print("regi2_button clicked. time: ", int(status["elapsed_time"]))
             status["regi_baristaNum"] = 2
             status["bar_baristaNum"] = 1
             status["click"] += 1
         if bar_button.check_button(events):
-            if status["regi2_customer"] != 0:
+            if status["regi2_customer"] != None:
                 status["waiting_regi_queue"].insert(0, status["regi2_customer"])
-                status["regi2_customer"] = 0
+                status["regi2_customer"] = None
             status["regi_baristaNum"] = 1
             status["bar_baristaNum"] = 2
             status["click"] += 1
         if menu_button.check_button(events):  # menuのボタンがクリックされた場合
-            print("menu_button clicked. time: ", status["elapsed_time"])
-            if status["regi2_customer"] != 0:
+            if status["regi2_customer"] != None:
                 status["waiting_regi_queue"].insert(0, status["regi2_customer"])
-                status["regi2_customer"] = 0
+                status["regi2_customer"] = None
                 status["regi_baristaNum"] = 1
                 status["bar_baristaNum"] = 1
             status["regi_baristaNum"] = 1
             status["bar_baristaNum"] = 1
             for i in range(len(status["waiting_regi_queue"])):
-                if status["waiting_regi_queue"][i] < 3:
-                    status["waiting_regi_queue"][i] += 3
+                if status["waiting_regi_queue"][i]["menued"] == False:
+                    status["waiting_regi_queue"][i]["menued"] = True
                     break
             status["click"] += 1
             status["menued"] += 1
@@ -162,13 +162,14 @@ def main():
         status = bar.bar_service(status)  # バーのドリンク作成管理
         status = drip.drip_decrease(status)  # ドリップの残量を減らす
         # status = buttonAction.set_drip(status)  # ボタンの管理
+
         screen_instance.clear()  # 画面を白で塗りつぶす
         screen_instance.draw_field()  # フィールドを描画
         screen_instance.draw_info_bar_frame()  # インフォメーションバーの静的コンテンツを描画
         screen_instance.draw_info_bar_value(
             regi.get_waiting_regi_num(status["waiting_regi_queue"]),
-            status["waiting_bar"],
-            status["served"],
+            len(status["waiting_bar_queue"]),
+            len(status["served"]),
             status["drip_coffee_sup_count"],
         )  # インフォメーションバーの動的コンテンツを描画
         screen_instance.draw_cool_time(  # クールタイムを描画
@@ -189,7 +190,7 @@ def main():
             screen_instance.draw_drip_barista()  # ドリップの位置にバリスタを描画
         screen_instance.draw_regi_waitingPeople(status)  # レジの待ち人数を描画
         screen_instance.draw_bar_waitingPeople(
-            status["waiting_bar"]
+            bar.get_waiting_num(status["waiting_bar_queue"])
         )  # バーの待ち人数を描画
         screen_instance.draw_drip_meter(status["drip_meter"])  # ドリップの残量を描画
         pygame.display.flip()  # 画面を更新
