@@ -14,7 +14,9 @@ import utils.regi as regi
 import utils.ScreenClass as ScreenClass
 
 load_dotenv()  # .envから環境変数を取得する。定数値の設定は別ファイルにしたほうが管理しやすいから
-pygame.init()  # Pygameの初期化
+
+
+simulation_start_flag = 0  # シミュレーション開始フラグ
 
 
 def main():
@@ -24,29 +26,27 @@ def main():
             "使い方: python main.py <シミュレーションタイプ (test か demo).> <APIトークン>"
         )
         sys.exit(1)
-    if sys.argv[1] == "test":
-        limit_time = int(os.getenv("SIMULATE_TIME"))  # シミュレーションの制限時間を取得
-    elif sys.argv[1] == "demo":
-        limit_time = int(os.getenv("DEMO_TIME"))  # シミュレーションの制限時間を取得
+    # APIトークンがxoxbから始まるかどうかをチェック
+    elif sys.argv[2] == "xoxb-":
+        print("APIトークンが不正です。")
+        sys.exit(1)
     else:
-        print(
-            "使い方: python main.py <シミュレーションタイプ (test か demo).> <APIトークン>"
-        )
+        if sys.argv[1] == "test":
+            limit_time = int(
+                os.getenv("SIMULATE_TIME")
+            )  # シミュレーションの制限時間を取得
+        elif sys.argv[1] == "demo":
+            limit_time = int(os.getenv("DEMO_TIME"))  # シミュレーションの制限時間を取得
+        else:
+            print(
+                "使い方: python main.py <シミュレーションタイプ (test か demo).> <APIトークン>"
+            )
 
     file_upload = (
         os.getenv("SLACK_UPLOAD") == "True" and sys.argv[1] == "test"
     )  # slackにログファイルをアップロードするかどうか
-
-    # APIトークンがxoxbから始まるかどうかをチェック
-    if sys.argv[2] == "xoxb-":
-        print("APIトークンが不正です。")
-        sys.exit(1)
-
-    screen_instance = ScreenClass.Screen()  # screenClassのインスタンスを生成
-
     # 被験者の名前を入力
     name = input("被験者の名前を入力してください: ")
-
     log_file_path = (
         f"log/" + time.strftime("%Y%m%d_%H%M%S_", time.localtime()) + name + ".json"
     )  # ログファイル名を生成
@@ -56,6 +56,9 @@ def main():
         limit_time,
         time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime()),
     )  # メタデータを出力
+
+    pygame.init()  # Pygameの初期化
+    screen_instance = ScreenClass.Screen()  # screenClassのインスタンスを生成
 
     # button設定
     field_object_coordinates = screen_instance.field_object_coordinates
@@ -102,11 +105,11 @@ def main():
 
     # ゲームループ
     running = True
+    Button.TimeLinkedButton.set_disabled(int(os.getenv("START_COOL_TIME")))
 
     while running:
         status["elapsed_time"] = time.time() - start_time  # 経過時間を計算（秒）
         events = pygame.event.get()  # pygame画面でのイベントを取得
-        log.dump_log(log_file_path, status)  # ログを出力
 
         for event in events:
             if event.type == pygame.QUIT:  # ウィンドウの×ボタンが押された場合
@@ -195,6 +198,7 @@ def main():
         screen_instance.draw_drip_meter(status["drip_meter"])  # ドリップの残量を描画
 
         pygame.display.flip()  # 画面を更新
+        log.dump_log(log_file_path, status)  # ログを出力
 
     # ゲーム終了後の処理
     if file_upload:
