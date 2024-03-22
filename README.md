@@ -7,9 +7,11 @@
 ## 実験環境構築
 
 1. ターミナルを開き、本リポジトリを任意の場所に clone する
+
    ```sh
    git clone https://github.com/Aquamana06/work_enpowerment_simulation.git
    ```
+
    <details>
       
       <summary>「Gitは内部コマンドまたは外部コマンド、操作可能なプログラムまたはバッチファイルとして認識されていません」とでた場合</summary>
@@ -24,7 +26,6 @@
         <img width="917" alt="Screenshot 2024-03-21 at 11 00 16" src="https://github.com/Aquamana06/work_enpowerment_simulation/assets/42343541/76e961b2-6dc1-4f15-8fd7-8d4997320938">
          
    </details>
-
 
 2. clone したリポジトリに移動
    ```sh
@@ -93,8 +94,8 @@
 ## log ファイルのクリア
 
 ```ps1
-  Get-ChildItem -Path "log\" -Filter "*.json" | ForEach-Object {
-    # ファイルが.jsonであれば削除する
+Get-ChildItem -Path "log\" -Filter "*.json", "*.mp4" | ForEach-Object {
+    # ファイルが.jsonまたは.mp4であれば削除する
     Remove-Item $_.FullName
     Write-Output "Removed: $($_.FullName)"
 }

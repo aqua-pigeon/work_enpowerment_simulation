@@ -1,11 +1,8 @@
 import os
 import sys
 import time
-<<<<<<< HEAD
-=======
 import webbrowser
 
->>>>>>> a63c12abc556bb945fa27f8f7e3890be4b91deac
 import pygame
 import requests
 from dotenv import load_dotenv
@@ -34,19 +31,6 @@ def main():
         print("APIトークンが不正です。")
         sys.exit(1)
     else:
-<<<<<<< HEAD
-        print(
-            "使い方: python main.py <シミュレーションタイプ (test か demo).> <APIトークン>"
-        )
-    file_upload = (
-        os.getenv("SLACK_UPLOAD") == "True" and sys.argv[1] == "test"
-    )  # slackにログファイルをアップロードするかどうか
-    # APIトークンがxoxbから始まるかどうかをチェック
-    if sys.argv[2] == "xoxb-":
-        print("APIトークンが不正です。")
-        sys.exit(1)
-    screen_instance = ScreenClass.Screen()  # screenClassのインスタンスを生成
-=======
         if sys.argv[1] == "test":
             limit_time = int(
                 os.getenv("SIMULATE_TIME")
@@ -61,7 +45,6 @@ def main():
     file_upload = (
         os.getenv("SLACK_UPLOAD") == "True" and sys.argv[1] == "test"
     )  # slackにログファイルをアップロードするかどうか
->>>>>>> a63c12abc556bb945fa27f8f7e3890be4b91deac
     # 被験者の名前を入力
     name = input("被験者の名前を入力してください: ")
     log_file_name = (
@@ -73,15 +56,12 @@ def main():
         limit_time,
         time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime()),
     )  # メタデータを出力
-<<<<<<< HEAD
-=======
 
     pygame.init()  # Pygameの初期化
     screen_instance = ScreenClass.Screen(
         log_file_name
     )  # screenClassのインスタンスを生成
 
->>>>>>> a63c12abc556bb945fa27f8f7e3890be4b91deac
     # button設定
     field_object_coordinates = screen_instance.field_object_coordinates
     # フィールドのオブジェクト座標を取得
@@ -125,12 +105,6 @@ def main():
     }
     # ゲームループ
     running = True
-<<<<<<< HEAD
-    while running:
-        status["elapsed_time"] = time.time() - start_time  # 経過時間を計算（秒）
-        events = pygame.event.get()  # pygame画面でのイベントを取得
-        log.dump_log(log_file_path, status)  # ログを出力
-=======
     Button.TimeLinkedButton.set_disabled(
         int(os.getenv("START_COOL_TIME"))
     )  # シミュレーション開始までのクールタイムを設定
@@ -139,7 +113,6 @@ def main():
         status["elapsed_time"] = time.time() - start_time  # 経過時間を計算（秒）
         events = pygame.event.get()  # pygame画面でのイベントを取得
 
->>>>>>> a63c12abc556bb945fa27f8f7e3890be4b91deac
         for event in events:
             if event.type == pygame.QUIT:  # ウィンドウの×ボタンが押された場合
                 break  # ゲームを終了
@@ -224,7 +197,6 @@ def main():
         screen_instance.record()  # 画面を記録
         screen_instance.clock.tick(screen_instance.input_fps)  # FPSを設定
 
->>>>>>> a63c12abc556bb945fa27f8f7e3890be4b91deac
     # ゲーム終了後の処理
     screen_instance.quit()  # Pygameを終了. 画面収録を終了
     webbrowser.open(os.getenv("QUESTIONNAIRE_URL"))  # アンケートページを開く
