@@ -1,11 +1,8 @@
 import os
 import sys
 import time
-<<<<<<< HEAD
-=======
 import webbrowser
 
->>>>>>> a63c12abc556bb945fa27f8f7e3890be4b91deac
 import pygame
 import requests
 from dotenv import load_dotenv
@@ -34,19 +31,6 @@ def main():
         print("APIトークンが不正です。")
         sys.exit(1)
     else:
-<<<<<<< HEAD
-        print(
-            "使い方: python main.py <シミュレーションタイプ (test か demo).> <APIトークン>"
-        )
-    file_upload = (
-        os.getenv("SLACK_UPLOAD") == "True" and sys.argv[1] == "test"
-    )  # slackにログファイルをアップロードするかどうか
-    # APIトークンがxoxbから始まるかどうかをチェック
-    if sys.argv[2] == "xoxb-":
-        print("APIトークンが不正です。")
-        sys.exit(1)
-    screen_instance = ScreenClass.Screen()  # screenClassのインスタンスを生成
-=======
         if sys.argv[1] == "test":
             limit_time = int(
                 os.getenv("SIMULATE_TIME")
@@ -61,25 +45,23 @@ def main():
     file_upload = (
         os.getenv("SLACK_UPLOAD") == "True" and sys.argv[1] == "test"
     )  # slackにログファイルをアップロードするかどうか
->>>>>>> a63c12abc556bb945fa27f8f7e3890be4b91deac
     # 被験者の名前を入力
     name = input("被験者の名前を入力してください: ")
-    log_file_path = (
-        f"log/" + time.strftime("%Y%m%d_%H%M%S_", time.localtime()) + name + ".json"
+    log_file_name = (
+        f"log/" + time.strftime("%Y%m%d_%H%M%S_", time.localtime()) + name
     )  # ログファイル名を生成
     log.set_meta(
-        log_file_path,
+        log_file_name + ".json",
         name,
         limit_time,
         time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime()),
     )  # メタデータを出力
-<<<<<<< HEAD
-=======
 
     pygame.init()  # Pygameの初期化
-    screen_instance = ScreenClass.Screen()  # screenClassのインスタンスを生成
+    screen_instance = ScreenClass.Screen(
+        log_file_name
+    )  # screenClassのインスタンスを生成
 
->>>>>>> a63c12abc556bb945fa27f8f7e3890be4b91deac
     # button設定
     field_object_coordinates = screen_instance.field_object_coordinates
     # フィールドのオブジェクト座標を取得
@@ -123,12 +105,6 @@ def main():
     }
     # ゲームループ
     running = True
-<<<<<<< HEAD
-    while running:
-        status["elapsed_time"] = time.time() - start_time  # 経過時間を計算（秒）
-        events = pygame.event.get()  # pygame画面でのイベントを取得
-        log.dump_log(log_file_path, status)  # ログを出力
-=======
     Button.TimeLinkedButton.set_disabled(
         int(os.getenv("START_COOL_TIME"))
     )  # シミュレーション開始までのクールタイムを設定
@@ -137,10 +113,9 @@ def main():
         status["elapsed_time"] = time.time() - start_time  # 経過時間を計算（秒）
         events = pygame.event.get()  # pygame画面でのイベントを取得
 
->>>>>>> a63c12abc556bb945fa27f8f7e3890be4b91deac
         for event in events:
             if event.type == pygame.QUIT:  # ウィンドウの×ボタンが押された場合
-                pygame.quit()
+                break  # ゲームを終了
         if status["elapsed_time"] > limit_time:  # 制限時間を超えた場合
             break  # ゲームを終了
         if drip_cofee_button.check_button(
@@ -218,15 +193,23 @@ def main():
         )  # バーの待ち人数を描画
         screen_instance.draw_drip_meter(status["drip_meter"])  # ドリップの残量を描画
         pygame.display.flip()  # 画面を更新
-<<<<<<< HEAD
-=======
-        log.dump_log(log_file_path, status)  # ログを出力
+        log.dump_log(log_file_name + ".json", status)  # ログを出力
+        screen_instance.record()  # 画面を記録
+        screen_instance.clock.tick(screen_instance.input_fps)  # FPSを設定
 
->>>>>>> a63c12abc556bb945fa27f8f7e3890be4b91deac
     # ゲーム終了後の処理
+    screen_instance.quit()  # Pygameを終了. 画面収録を終了
+    webbrowser.open(os.getenv("QUESTIONNAIRE_URL"))  # アンケートページを開く
     if file_upload:
         # logファイルを開いてslackにアップロード
-        with open(log_file_path, "rb") as file:
+        with open(log_file_name + ".json", "rb") as file:
+            response = requests.post(
+                url="https://slack.com/api/files.upload",
+                headers={"Authorization": f"Bearer {sys.argv[2]}"},
+                data={"channels": os.getenv("SLACK_CHANNEL")},
+                files={"file": file},
+            )
+        with open(log_file_name + ".mp4", "rb") as file:
             response = requests.post(
                 url="https://slack.com/api/files.upload",
                 headers={"Authorization": f"Bearer {sys.argv[2]}"},
@@ -239,7 +222,6 @@ def main():
             sys.exit(1)
         print("logファイルをアップロードしました。")
     print("実験お疲れ様でした。引き続きアンケートのご協力をお願いします")
-    webbrowser.open(os.getenv("QUESTIONNAIRE_URL"))  # アンケートページを開く
 
 
 if __name__ == "__main__":
