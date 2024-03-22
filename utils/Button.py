@@ -67,15 +67,15 @@ class TimeLinkedButton:  # instance同士でcool_time_timerとdisable_set_time, 
     click_time = 0  # クリックされた回数
     disable_set_time = 0  # クリックが無効になった時間
     click_disable = False  # クリックが無効かどうか
-    cool_time = None  # デフォルトのクリックが無効になる時間
+    cool_time_byClick = None  # クリック時にセットするクールタイム
     cool_time_timer = None  # 実際に使用するクリックが無効になる時間
 
-    def __init__(self, area_coordinate, cool_time=None):
+    def __init__(self, area_coordinate, cool_time_byClick=None):
         self.area_coordinate = area_coordinate  # ボタンの領域を表すRectオブジェクト
         self.area_rect = pygame.Rect(
             area_coordinate
         )  # ボタンの領域を表すRectオブジェクト
-        self.cool_time = cool_time  # クリックが無効になる時間
+        self.cool_time_byClick = cool_time_byClick  # クリックが無効になる時間
 
     def check_button(self, events):  # ボタンがクリックされたかどうかを確認
         if (
@@ -99,16 +99,16 @@ class TimeLinkedButton:  # instance同士でcool_time_timerとdisable_set_time, 
                             time.time()
                         )  # 最後にクリックされた時間を記録
                         self.click_time += 1
-                        if self.cool_time != None:
-                            self.set_disabled(self.cool_time)
+                        if self.cool_time_byClick != None:
+                            self.set_disabled(self.cool_time_byClick)
                         return True
 
         return False  # ボタンクリックが無効 または ボタンクリックが有効だがクリックされていない場合
 
+    @staticmethod
     def set_disabled(
-        self,
         cool_time=None,
-    ):  # 任意のcool_timeを設定できるように、cool_timeとcool_time_timerを分けた
+    ):  # cool_timeを設定
         TimeLinkedButton.click_disable = True  # クリックを無効にするフラグを立てる
         TimeLinkedButton.disable_set_time = (
             time.time()
