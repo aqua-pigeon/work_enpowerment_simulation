@@ -203,15 +203,23 @@ def main():
         screen_instance.draw_drip_meter(status["drip_meter"])  # ドリップの残量を描画
 
         pygame.display.flip()  # 画面を更新
-        log.dump_log(log_file_path, status)  # ログを出力
+        log.dump_log(log_file_name + ".json", status)  # ログを出力
         screen_instance.record()  # 画面を記録
         screen_instance.clock.tick(screen_instance.input_fps)  # FPSを設定
 
     # ゲーム終了後の処理
     screen_instance.quit()  # Pygameを終了. 画面収録を終了
+    webbrowser.open(os.getenv("QUESTIONNAIRE_URL"))  # アンケートページを開く
     if file_upload:
         # logファイルを開いてslackにアップロード
-        with open(log_file_path, "rb") as file:
+        with open(log_file_name + ".json", "rb") as file:
+            response = requests.post(
+                url="https://slack.com/api/files.upload",
+                headers={"Authorization": f"Bearer {sys.argv[2]}"},
+                data={"channels": os.getenv("SLACK_CHANNEL")},
+                files={"file": file},
+            )
+        with open(log_file_name + ".mp4", "rb") as file:
             response = requests.post(
                 url="https://slack.com/api/files.upload",
                 headers={"Authorization": f"Bearer {sys.argv[2]}"},
@@ -224,7 +232,6 @@ def main():
             sys.exit(1)
         print("logファイルをアップロードしました。")
     print("実験お疲れ様でした。引き続きアンケートのご協力をお願いします")
-    webbrowser.open(os.getenv("QUESTIONNAIRE_URL"))  # アンケートページを開く
 
 
 if __name__ == "__main__":
