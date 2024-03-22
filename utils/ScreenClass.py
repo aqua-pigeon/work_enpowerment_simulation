@@ -1,5 +1,6 @@
 import os
 
+import cv2
 import pygame
 from dotenv import load_dotenv
 
@@ -15,7 +16,7 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 BROWN = (165, 42, 42)
-CREAM =(255, 238, 205)
+CREAM = (255, 238, 205)
 
 
 class Screen:
@@ -27,15 +28,49 @@ class Screen:
         "drip_coffee": (420, 480, 80, 70),
         "menu": (60, 200, 100, 90),
     }
+    frame_count = (
+        -1
+    )  # 録画時に使用するフレームカウント. record_frame_intervalごとに動画に出力
 
-    def __init__(self):
+    def __init__(self, log_file_name):
         # ウィンドウの設定
         pygame.init()  # Pygameの初期化
-        screen_width = int(os.getenv("SCREEN_WIDTH"))
-        screen_height = int(os.getenv("SCREEN_HEIGHT"))
-        self.screen = pygame.display.set_mode((screen_width, screen_height))
+        self.width = int(os.getenv("SCREEN_WIDTH"))
+        self.height = int(os.getenv("SCREEN_HEIGHT"))
+        self.record_fps = int(os.getenv("RECORD_FPS"))  # 1秒間に何回画像を保存するか
+        self.input_fps = int(
+            os.getenv("INPUT_FPS")
+        )  # 1秒間に何回ユーザーからの入力を受け付けるか
+        self.record_frame_interval = (
+            self.input_fps // self.record_fps
+        )  # 何フレームごとに画像を保存するか
+        self.output_file = log_file_name + ".mp4"
+        self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("WORK_ENVIRONMENT_SIMULATION")
-        pygame.time.Clock().tick(30)  # FPSを30に設定
+        self.clock = pygame.time.Clock()
+        # 動画ファイルの設定
+        fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+        self.video_writer = cv2.VideoWriter(
+            self.output_file, fourcc, self.record_fps, (self.width, self.height)
+        )
+
+    def record(self):
+        self.frame_count += 1
+        print(self.frame_count)
+        if self.frame_count % self.record_frame_interval == 0:
+            # 画面をキャプチャして動画ファイルに保存
+            screen = pygame.display.get_surface()
+            screen = pygame.surfarray.pixels3d(screen)
+            screen = cv2.transpose(screen)
+            screen = cv2.cvtColor(screen, cv2.COLOR_RGB2BGR)
+            self.video_writer.write(screen)
+
+    def record_stop(self):  # 動画ファイルを閉じる
+        self.video_writer.release()
+
+    def quit(self):  # Pygameを終了
+        self.record_stop()
+        pygame.quit()
 
     def clear(self):
         self.screen.fill(CREAM)

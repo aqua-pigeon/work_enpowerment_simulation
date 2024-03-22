@@ -48,18 +48,20 @@ def main():
     )  # slackにログファイルをアップロードするかどうか
     # 被験者の名前を入力
     name = input("被験者の名前を入力してください: ")
-    log_file_path = (
-        f"log/" + time.strftime("%Y%m%d_%H%M%S_", time.localtime()) + name + ".json"
+    log_file_name = (
+        f"log/" + time.strftime("%Y%m%d_%H%M%S_", time.localtime()) + name
     )  # ログファイル名を生成
     log.set_meta(
-        log_file_path,
+        log_file_name + ".json",
         name,
         limit_time,
         time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime()),
     )  # メタデータを出力
 
     pygame.init()  # Pygameの初期化
-    screen_instance = ScreenClass.Screen()  # screenClassのインスタンスを生成
+    screen_instance = ScreenClass.Screen(
+        log_file_name
+    )  # screenClassのインスタンスを生成
 
     # button設定
     field_object_coordinates = screen_instance.field_object_coordinates
@@ -116,7 +118,7 @@ def main():
 
         for event in events:
             if event.type == pygame.QUIT:  # ウィンドウの×ボタンが押された場合
-                pygame.quit()
+                break  # ゲームを終了
         if status["elapsed_time"] > limit_time:  # 制限時間を超えた場合
             break  # ゲームを終了
 
@@ -202,8 +204,11 @@ def main():
 
         pygame.display.flip()  # 画面を更新
         log.dump_log(log_file_path, status)  # ログを出力
+        screen_instance.record()  # 画面を記録
+        screen_instance.clock.tick(screen_instance.input_fps)  # FPSを設定
 
     # ゲーム終了後の処理
+    screen_instance.quit()  # Pygameを終了. 画面収録を終了
     if file_upload:
         # logファイルを開いてslackにアップロード
         with open(log_file_path, "rb") as file:
