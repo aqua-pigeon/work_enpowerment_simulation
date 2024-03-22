@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import webbrowser
 
 import pygame
 import requests
@@ -105,7 +106,9 @@ def main():
 
     # ゲームループ
     running = True
-    Button.TimeLinkedButton.set_disabled(int(os.getenv("START_COOL_TIME")))
+    Button.TimeLinkedButton.set_disabled(
+        int(os.getenv("START_COOL_TIME"))
+    )  # シミュレーション開始までのクールタイムを設定
 
     while running:
         status["elapsed_time"] = time.time() - start_time  # 経過時間を計算（秒）
@@ -215,7 +218,8 @@ def main():
             print(response.json())
             sys.exit(1)
         print("logファイルをアップロードしました。")
-    print("実験お疲れ様でした。")
+    print("実験お疲れ様でした。引き続きアンケートのご協力をお願いします")
+    webbrowser.open(os.getenv("QUESTIONNAIRE_URL"))  # アンケートページを開く
 
 
 if __name__ == "__main__":
