@@ -22,8 +22,3 @@ def drip_decrease(status):
     else:
         drip_decrease_flag = False
     return status
-
-    # if
-    #     status["os_cool_time"]=20
-    #     status["drip_coffee"]+=1
-    #     status["drip_meter"]=5

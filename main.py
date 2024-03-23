@@ -6,6 +6,7 @@ import webbrowser
 import pygame
 import requests
 from dotenv import load_dotenv
+
 import utils.bar as bar
 import utils.Button as Button
 import utils.drip as drip
@@ -47,18 +48,20 @@ def main():
     )  # slackにログファイルをアップロードするかどうか
     # 被験者の名前を入力
     name = input("被験者の名前を入力してください: ")
-    log_file_path = (
-        f"log/" + time.strftime("%Y%m%d_%H%M%S_", time.localtime()) + name + ".json"
+    log_file_name = (
+        f"log/" + time.strftime("%Y%m%d_%H%M%S_", time.localtime()) + name
     )  # ログファイル名を生成
     log.set_meta(
-        log_file_path,
+        log_file_name + ".json",
         name,
         limit_time,
         time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime()),
     )  # メタデータを出力
 
     pygame.init()  # Pygameの初期化
-    screen_instance = ScreenClass.Screen()  # screenClassのインスタンスを生成
+    screen_instance = ScreenClass.Screen(
+        log_file_name
+    )  # screenClassのインスタンスを生成
 
     # button設定
     field_object_coordinates = screen_instance.field_object_coordinates
@@ -86,15 +89,15 @@ def main():
         "regi1_start_time": 0,  # 接客開始時間
         "regi2_start_time": 0,  # 接客開始時間
         "bar_start_time": 0,  # ドリンク作成開始時間
-        "waiting_regi_queue": [],  # 待ち行列の人数
-        "waiting_bar": 0,  # 待ち行列の人数
-        "served": 0,  # サービスされた人数=作成されたドリンクの数
+        "waiting_regi_queue": [],  # regi待ち行列
+        "waiting_bar_queue": [],  # bar待ち行列
+        "served": [],  # サービスされたお客さん
         "drip_coffee_sup_count": 0,  # ドリップコーヒーの補充回数
         "drip_meter": 5,  # ドリップの残量
         "arrive_1_flag": True,  # 到着を受理していいか否か
         "arrive_2_flag": True,  # 到着を受理していいか否か
-        "regi1_customer": 0,  # レジ1が空いている=0, 1or2=空いていない
-        "regi2_customer": 0,  # レジ2が空いている=0, 1or2=空いていない
+        "regi1_customer": None,  # レジ1が空いている=None
+        "regi2_customer": None,  # レジ2が空いている=None
         "is_bar_free": True,  # バーが空いているか
         "elapsed_time": 0,  # 経過時間（秒）
         "regi_serviced_time": 0,  # 何人めのお客さんか
@@ -113,45 +116,44 @@ def main():
 
         for event in events:
             if event.type == pygame.QUIT:  # ウィンドウの×ボタンが押された場合
-                pygame.quit()
+                running = False  # ゲームを終了
+                break
         if status["elapsed_time"] > limit_time:  # 制限時間を超えた場合
             break  # ゲームを終了
         if drip_cofee_button.check_button(
             events
         ):  # ドリップコーヒーのボタンがクリックされた場合
             # print("drip_coffee_button clicked. time: ", status["elapsed_time"])
-            if status["regi2_customer"] != 0:
+            if status["regi2_customer"] != None:
                 status["waiting_regi_queue"].insert(0, status["regi2_customer"])
-                status["regi2_customer"] = 0
+                status["regi2_customer"] = None
             status["regi_baristaNum"] = 1
             status["bar_baristaNum"] = 1
             status["drip_coffee_sup_count"] += 1
             status["drip_meter"] = 5
             status["click"] += 1
         if regi2_button.check_button(events):  # regi2のボタンがクリックされた場合
-            print("regi2_button clicked. time: ", int(status["elapsed_time"]))
             status["regi_baristaNum"] = 2
             status["bar_baristaNum"] = 1
             status["click"] += 1
         if bar_button.check_button(events):
-            if status["regi2_customer"] != 0:
+            if status["regi2_customer"] != None:
                 status["waiting_regi_queue"].insert(0, status["regi2_customer"])
-                status["regi2_customer"] = 0
+                status["regi2_customer"] = None
             status["regi_baristaNum"] = 1
             status["bar_baristaNum"] = 2
             status["click"] += 1
         if menu_button.check_button(events):  # menuのボタンがクリックされた場合
-            print("menu_button clicked. time: ", status["elapsed_time"])
-            if status["regi2_customer"] != 0:
+            if status["regi2_customer"] != None:
                 status["waiting_regi_queue"].insert(0, status["regi2_customer"])
-                status["regi2_customer"] = 0
+                status["regi2_customer"] = None
                 status["regi_baristaNum"] = 1
                 status["bar_baristaNum"] = 1
             status["regi_baristaNum"] = 1
             status["bar_baristaNum"] = 1
             for i in range(len(status["waiting_regi_queue"])):
-                if status["waiting_regi_queue"][i] < 3:
-                    status["waiting_regi_queue"][i] += 3
+                if status["waiting_regi_queue"][i]["menued"] == False:
+                    status["waiting_regi_queue"][i]["menued"] = True
                     break
             status["click"] += 1
             status["menued"] += 1
@@ -160,13 +162,14 @@ def main():
         status = bar.bar_service(status)  # バーのドリンク作成管理
         status = drip.drip_decrease(status)  # ドリップの残量を減らす
         # status = buttonAction.set_drip(status)  # ボタンの管理
+
         screen_instance.clear()  # 画面を白で塗りつぶす
         screen_instance.draw_field()  # フィールドを描画
         screen_instance.draw_info_bar_frame()  # インフォメーションバーの静的コンテンツを描画
         screen_instance.draw_info_bar_value(
             regi.get_waiting_regi_num(status["waiting_regi_queue"]),
-            status["waiting_bar"],
-            status["served"],
+            len(status["waiting_bar_queue"]),
+            len(status["served"]),
             status["drip_coffee_sup_count"],
         )  # インフォメーションバーの動的コンテンツを描画
         screen_instance.draw_cool_time(  # クールタイムを描画
@@ -187,16 +190,28 @@ def main():
             screen_instance.draw_drip_barista()  # ドリップの位置にバリスタを描画
         screen_instance.draw_regi_waitingPeople(status)  # レジの待ち人数を描画
         screen_instance.draw_bar_waitingPeople(
-            status["waiting_bar"]
+            bar.get_waiting_num(status["waiting_bar_queue"])
         )  # バーの待ち人数を描画
         screen_instance.draw_drip_meter(status["drip_meter"])  # ドリップの残量を描画
         pygame.display.flip()  # 画面を更新
-        log.dump_log(log_file_path, status)  # ログを出力
+        log.dump_log(log_file_name + ".json", status)  # ログを出力
+        screen_instance.record()  # 画面を記録
+        screen_instance.clock.tick(screen_instance.input_fps)  # FPSを設定
 
     # ゲーム終了後の処理
+    screen_instance.quit()  # Pygameを終了. 画面収録を終了
+    log.dump_result(log_file_name + ".json", status)  # 結果を出力
     if file_upload:
+        webbrowser.open(os.getenv("QUESTIONNAIRE_URL"))  # アンケートページを開く
         # logファイルを開いてslackにアップロード
-        with open(log_file_path, "rb") as file:
+        with open(log_file_name + ".json", "rb") as file:
+            response = requests.post(
+                url="https://slack.com/api/files.upload",
+                headers={"Authorization": f"Bearer {sys.argv[2]}"},
+                data={"channels": os.getenv("SLACK_CHANNEL")},
+                files={"file": file},
+            )
+        with open(log_file_name + ".mp4", "rb") as file:
             response = requests.post(
                 url="https://slack.com/api/files.upload",
                 headers={"Authorization": f"Bearer {sys.argv[2]}"},
@@ -209,7 +224,6 @@ def main():
             sys.exit(1)
         print("logファイルをアップロードしました。")
     print("実験お疲れ様でした。引き続きアンケートのご協力をお願いします")
-    webbrowser.open(os.getenv("QUESTIONNAIRE_URL"))  # アンケートページを開く
 
 
 if __name__ == "__main__":
