@@ -25,7 +25,7 @@ def dump_log(file_path, status):
     log_data = status.copy()
     # logするデータから不要なものを削除
     log_data.pop("served")
-    data["body"].append(status)
+    data["body"].append(log_data)
     # ファイルの書き込み
     with open(file_path, "w") as f:
         json.dump(data, f, indent=4)

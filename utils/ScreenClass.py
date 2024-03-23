@@ -56,7 +56,6 @@ class Screen:
 
     def record(self):
         self.frame_count += 1
-        print(self.frame_count)
         if self.frame_count % self.record_frame_interval == 0:
             # 画面をキャプチャして動画ファイルに保存
             screen = pygame.display.get_surface()
