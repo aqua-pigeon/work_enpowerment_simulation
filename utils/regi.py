@@ -64,7 +64,7 @@ def regi_service(status):
                 )
             else:
                 status["regi1_time"] = (
-                    REGI_SERVICE_BASE_TIME * status["regi1_customer"]["num"] *0.8
+                    REGI_SERVICE_BASE_TIME * status["regi1_customer"]["num"] * 0.8
                 )
             status["regi1_start_time"] = time.time()
 
@@ -82,7 +82,7 @@ def regi_service(status):
                 )
             else:
                 status["regi2_time"] = (
-                    REGI_SERVICE_BASE_TIME * status["regi2_customer"]["num"] *0,8
+                    REGI_SERVICE_BASE_TIME * status["regi2_customer"]["num"] * 0.8
                 )
             status["regi2_start_time"] = time.time()
 
