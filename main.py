@@ -49,7 +49,7 @@ def main():
     # 被験者の名前を入力
     name = input("被験者の名前を入力してください: ")
     log_file_name = (
-        f"log/" + time.strftime("%Y%m%d_%H%M%S_", time.localtime()) + name
+        f"log/" + name + time.strftime("%Y%m%d_%H%M%S_", time.localtime())
     )  # ログファイル名を生成
     logger = JsonLogger.JsonLogger(
         log_file_name + ".json"
