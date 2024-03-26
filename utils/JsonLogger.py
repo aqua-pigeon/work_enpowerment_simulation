@@ -17,7 +17,7 @@ class JsonLogger:
         self.file_path = file_path
 
     def __del__(self):
-        self.write()
+        self.save()
 
     def set_body(self, status) -> None:
         if status["elapsed_time"] - self.last_dump_time < int(
@@ -43,6 +43,6 @@ class JsonLogger:
             "begin_time": begin_time,
         }
 
-    def write(self) -> None:
+    def save(self) -> None:
         with open(self.file_path, "w") as f:
             json.dump(self.log_template, f, indent=4)

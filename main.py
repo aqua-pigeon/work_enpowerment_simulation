@@ -156,9 +156,6 @@ def main():
             for item in status["waiting_regi_queue"]:
                 if not item["menued"]:
                     item["menued"] = True
-                    print(item)
-                    print(status["waiting_regi_queue"])
-                    print(status["regi1_customer"])
                     break
             status["click"] += 1
             status["menued"] += 1
@@ -206,6 +203,8 @@ def main():
     # ゲーム終了後の処理
     screen_instance.quit()  # Pygameを終了. 画面収録を終了
     logger.set_result(status)  # 結果を出力
+    logger.save()  # ログを保存
+
     if file_upload:
         print("実験お疲れ様でした。引き続きアンケートのご協力をお願いします")
         webbrowser.open(os.getenv("QUESTIONNAIRE_URL"))  # アンケートページを開く
