@@ -49,16 +49,15 @@ def main():
     # 被験者の名前を入力
     name = input("被験者の名前を入力してください: ")
     log_file_name = (
-        f"log/" + name + time.strftime("%Y%m%d_%H%M%S_", time.localtime())
+        f"log/" + name + time.strftime("_%Y%m%d_%H%M%S", time.localtime())
     )  # ログファイル名を生成
     logger = JsonLogger.JsonLogger(
         log_file_name + ".json"
     )  # loggerのインスタンスを作成
     logger.set_meta(
         name,
-        limit_time,
         time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime()),
-    )  # メタデータをセット
+    )  # メタデータをセット: 被験者の名前、実験開始時間、
 
     pygame.init()  # Pygameの初期化
     screen_instance = ScreenClass.ScreenClass(

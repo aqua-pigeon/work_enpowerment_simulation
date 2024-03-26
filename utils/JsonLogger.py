@@ -1,7 +1,8 @@
 import json
 import os
+import time
 
-from dotenv import load_dotenv
+from dotenv import dotenv_values, load_dotenv
 
 load_dotenv()
 
@@ -35,14 +36,21 @@ class JsonLogger:
         # データの追加
         self.log_template["result"] = status["served"]
 
-    def set_meta(self, name: str, limit_time: str, begin_time: str) -> None:
+    def set_meta(self, name: str, begin_time: str) -> None:
+        # .envの内容を全て取得
+        env = dotenv_values(".env")
         # データの追加
         self.log_template["meta"] = {
             "name": name,
-            "limit_time": limit_time,
             "begin_time": begin_time,
+            "end_time": "",
+            "env": env,
         }
 
     def save(self) -> None:
+        self.log_template["meta"]["end_time"] = time.strftime(
+            "%Y-%m-%dT%H:%M:%S", time.localtime()
+        )
+        # ファイルに書き込み
         with open(self.file_path, "w") as f:
             json.dump(self.log_template, f, indent=4)
