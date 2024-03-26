@@ -19,7 +19,7 @@ BROWN = (165, 42, 42)
 CREAM = (255, 238, 205)
 
 
-class Screen:
+class ScreenClass:
     field_object_coordinates = {
         "field": (200, 300, 650, 250),
         "regi1": (250, 300, 80, 50),
