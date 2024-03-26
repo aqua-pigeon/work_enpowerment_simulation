@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 import utils.bar as bar
 import utils.Button as Button
 import utils.drip as drip
-import utils.log as log
+import utils.JsonLogger as JsonLogger
 import utils.regi as regi
 import utils.ScreenClass as ScreenClass
 
@@ -51,15 +51,17 @@ def main():
     log_file_name = (
         f"log/" + time.strftime("%Y%m%d_%H%M%S_", time.localtime()) + name
     )  # ログファイル名を生成
-    log.set_meta(
-        log_file_name + ".json",
+    logger = JsonLogger.JsonLogger(
+        log_file_name + ".json"
+    )  # loggerのインスタンスを作成
+    logger.set_meta(
         name,
         limit_time,
         time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime()),
-    )  # メタデータを出力
+    )  # メタデータをセット
 
     pygame.init()  # Pygameの初期化
-    screen_instance = ScreenClass.Screen(
+    screen_instance = ScreenClass.ScreenClass(
         log_file_name
     )  # screenClassのインスタンスを生成
 
@@ -151,9 +153,12 @@ def main():
                 status["bar_baristaNum"] = 1
             status["regi_baristaNum"] = 1
             status["bar_baristaNum"] = 1
-            for i in range(len(status["waiting_regi_queue"])):
-                if status["waiting_regi_queue"][i]["menued"] == False:
-                    status["waiting_regi_queue"][i]["menued"] = True
+            for item in status["waiting_regi_queue"]:
+                if not item["menued"]:
+                    item["menued"] = True
+                    print(item)
+                    print(status["waiting_regi_queue"])
+                    print(status["regi1_customer"])
                     break
             status["click"] += 1
             status["menued"] += 1
@@ -194,14 +199,15 @@ def main():
         )  # バーの待ち人数を描画
         screen_instance.draw_drip_meter(status["drip_meter"])  # ドリップの残量を描画
         pygame.display.flip()  # 画面を更新
-        log.dump_log(log_file_name + ".json", status)  # ログを出力
+        logger.set_body(status)  # ログを出力
         screen_instance.record()  # 画面を記録
         screen_instance.clock.tick(screen_instance.input_fps)  # FPSを設定
 
     # ゲーム終了後の処理
     screen_instance.quit()  # Pygameを終了. 画面収録を終了
-    log.dump_result(log_file_name + ".json", status)  # 結果を出力
+    logger.set_result(status)  # 結果を出力
     if file_upload:
+        print("実験お疲れ様でした。引き続きアンケートのご協力をお願いします")
         webbrowser.open(os.getenv("QUESTIONNAIRE_URL"))  # アンケートページを開く
         # logファイルを開いてslackにアップロード
         with open(log_file_name + ".json", "rb") as file:
@@ -223,7 +229,6 @@ def main():
             print(response.json())
             sys.exit(1)
         print("logファイルをアップロードしました。")
-    print("実験お疲れ様でした。引き続きアンケートのご協力をお願いします")
 
 
 if __name__ == "__main__":

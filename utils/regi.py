@@ -11,17 +11,18 @@ ARRIVE_2_INTERVAL = int(os.getenv("ARRIVE_2_INTERVAL"))
 REGI_SERVICE_BASE_TIME = int(os.getenv("REGI_SERVICE_BASE_TIME"))
 
 regi_customer_count = 0
+customer_dict_template = {
+    "num": None,  # 1: お客さん1人, 2: お客さん2人
+    "arrive_time": None,
+    "menued": False,
+    "regi_time": None,
+    "leave_time": None,
+}
 
 
 def regi_customer_arrive(status):
     global regi_customer_count
-    customer_dict = {
-        "num": None,  # 1: お客さん1人, 2: お客さん2人
-        "arrive_time": None,
-        "menued": False,
-        "regi_time": None,
-        "leave_time": None,
-    }
+    customer_dict = customer_dict_template.copy()
     if int(status["elapsed_time"]) % ARRIVE_1_INTERVAL == 0:
         if status["arrive_1_flag"]:
             regi_customer_count += 1
@@ -34,6 +35,8 @@ def regi_customer_arrive(status):
             status["arrive_1_flag"] = False
     else:
         status["arrive_1_flag"] = True
+
+    customer_dict = customer_dict_template.copy()
     if int(status["elapsed_time"]) % ARRIVE_2_INTERVAL == 0:
         if status["arrive_2_flag"]:
             regi_customer_count += 1
@@ -54,6 +57,7 @@ def regi_service(status):
     if status["regi1_customer"] == None:
         if queue_length > 0:
             status["regi1_customer"] = status["waiting_regi_queue"].pop(0)
+            queue_length -= 1
             if status["regi1_customer"]["menued"] == False:
                 status["regi1_time"] = (
                     REGI_SERVICE_BASE_TIME * status["regi1_customer"]["num"]
@@ -69,7 +73,6 @@ def regi_service(status):
         status["waiting_bar_queue"].append(status["regi1_customer"])
         status["regi1_customer"] = None
 
-    queue_length = len(status["waiting_regi_queue"])
     if status["regi_baristaNum"] > 1:
         if status["regi2_customer"] == None and queue_length > 0:
             status["regi2_customer"] = status["waiting_regi_queue"].pop(0)
