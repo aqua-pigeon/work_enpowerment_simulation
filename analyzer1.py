@@ -1,9 +1,6 @@
 import json
-import sys
-
 import utils.regi as regi
-
-# まだお客さんを数字で管理していた頃のバージョン
+import sys
 
 
 def main():
@@ -29,7 +26,7 @@ def main():
     # print(waiting_regi_num)
     # waiting_regi_numの平均を求める
     waiting_regi_num_average = sum(waiting_regi_num) / len(waiting_regi_num)
-    print("待ち人数平均", waiting_regi_num_average)
+    print("待ち人数平均",waiting_regi_num_average)
 
     # bodyの中のbar_baristaNumだけを取り出す
     bar_baristaNum = [b["bar_baristaNum"] for b in body]
@@ -38,42 +35,56 @@ def main():
     bar_baristaNum_average = sum(bar_baristaNum) / len(bar_baristaNum)
     print("barバリスタ平均", bar_baristaNum_average)
 
-    # waiting_barの平均を求める
-    waiting_bar = [b["waiting_bar"] for b in body]
-    waiting_bar_average = sum(waiting_bar) / len(waiting_bar)
-    print("waiting_bar平均", waiting_bar_average)
+    #waiting_barの平均を求める
+    # waiting_bar = [b["waiting_bar"] for b in body]
+    # waiting_bar_average = sum(waiting_bar) / len(waiting_bar)
+    # print("waiting_bar平均", waiting_bar_average)
 
-    # 最終的なservedを出力
-    served = body[-1]["served"]
-    print("served", served)
+    # #最終的なservedを出力
+    # served = body[-1]["served"]
+    # print("served", served)
 
-    # regi_baristaNumの平均を求める
-    regi_baristaNum = [b["regi_baristaNum"] for b in body]
-    regi_baristaNum_average = sum(regi_baristaNum) / len(regi_baristaNum)
-    print("regi_baristaNum平均", regi_baristaNum_average)
+    # #regi_baristaNumの平均を求める
+    # regi_baristaNum = [b["regi_baristaNum"] for b in body]
+    # regi_baristaNum_average = sum(regi_baristaNum) / len(regi_baristaNum)
+    # print("regi_baristaNum平均", regi_baristaNum_average)
 
-    # drip_meterの平均を求める
-    drip_meter = [b["drip_meter"] for b in body]
-    drip_meter_average = sum(drip_meter) / len(drip_meter)
-    print("drip_meter平均", drip_meter_average)
+    # #drip_meterの平均を求める
+    # drip_meter = [b["drip_meter"] for b in body]
+    # drip_meter_average = sum(drip_meter) / len(drip_meter)
+    # print("drip_meter平均", drip_meter_average)
 
-    # drip_coffee_sup_countを出力
-    drip_coffee_sup_count = body[-1]["drip_coffee_sup_count"]
-    print("drip補充回数", drip_coffee_sup_count)
+    # #drip_coffee_sup_countを出力
+    # drip_coffee_sup_count = body[-1]["drip_coffee_sup_count"]
+    # print("drip補充回数", drip_coffee_sup_count)
 
-    # drip_meterが0になった回数を出力
-    drip_meter_zero_count = 0
-    for i in drip_meter:
-        if i == 0:
-            drip_meter_zero_count += 1
-    print("drip_meterが0になった回数", drip_meter_zero_count)
+    # #drip_meterが0になった回数を出力
+    # drip_meter_zero_count = 0
+    # for i in drip_meter:
+    #     if i == 0:
+    #         drip_meter_zero_count += 1
+    # print("drip_meterが0になった回数", drip_meter_zero_count)
 
-    # clickの回数を出力
-    click = body[-1]["click"]
-    print("click回数", click)
+    # #clickの回数を出力
+    # click = body[-1]["click"]
+    # print("click回数", click)
 
-    # 最大の待ち時間を出力
-    max_waiting_time = max(waiting_regi_queue)
+    #最大の待ち時間を出力
+    # max_waiting_time = max(waiting_regi_queue)
+
+    #numの合計を出力
+    num_sum = 0 
+    for i in body:
+        num_sum += i["body"]["num"]
+    print("numの合計", num_sum)
+
+
+
+
+
+
+
+
 
 
 if __name__ == "__main__":

@@ -25,7 +25,8 @@ class JsonLogger:
             os.getenv("LOG_INTERVAL")
         ):
             return
-        self.last_dump_time = status["elapsed_time"]
+        print(f"log dump: {status['elapsed_time']}")
+        self.last_dump_time = int(status["elapsed_time"])
         # logデータの取得
         log_data = status.copy()
         # logするデータから不要なものを削除
