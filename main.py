@@ -124,18 +124,19 @@ def main():
         if drip_cofee_button.check_button(
             events
         ):  # ドリップコーヒーのボタンがクリックされた場合
-            # print("drip_coffee_button clicked. time: ", status["elapsed_time"])
             if status["regi2_customer"] != None:
                 status["waiting_regi_queue"].insert(0, status["regi2_customer"])
                 status["regi2_customer"] = None
             status["regi_baristaNum"] = 1
             status["bar_baristaNum"] = 1
+            status["drip_baristaNum"] = 1
             status["drip_coffee_sup_count"] += 1
             status["drip_meter"] = 5
             status["click"] += 1
         if regi2_button.check_button(events):  # regi2のボタンがクリックされた場合
             status["regi_baristaNum"] = 2
             status["bar_baristaNum"] = 1
+            status["drip_baristaNum"] = 0
             status["click"] += 1
         if bar_button.check_button(events):
             if status["regi2_customer"] != None:
@@ -143,6 +144,7 @@ def main():
                 status["regi2_customer"] = None
             status["regi_baristaNum"] = 1
             status["bar_baristaNum"] = 2
+            status["drip_baristaNum"] = 0
             status["click"] += 1
         if menu_button.check_button(events):  # menuのボタンがクリックされた場合
             if status["regi2_customer"] != None:
@@ -151,6 +153,7 @@ def main():
                 status["regi_baristaNum"] = 1
                 status["bar_baristaNum"] = 1
             status["regi_baristaNum"] = 1
+            status["drip_baristaNum"] = 0
             status["bar_baristaNum"] = 1
             for item in status["waiting_regi_queue"]:
                 if not item["menued"]:
