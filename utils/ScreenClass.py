@@ -17,6 +17,7 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 BROWN = (165, 42, 42)
 CREAM = (255, 238, 205)
+SKYBLUE = (0, 202, 236)
 
 
 class ScreenClass:
@@ -31,6 +32,9 @@ class ScreenClass:
     frame_count = (
         -1
     )  # 録画時に使用するフレームカウント. record_frame_intervalごとに動画に出力
+
+    def __del__(self):
+        self.quit()
 
     def __init__(self, log_file_name):
         # ウィンドウの設定
@@ -64,12 +68,9 @@ class ScreenClass:
             screen = cv2.cvtColor(screen, cv2.COLOR_RGB2BGR)
             self.video_writer.write(screen)
 
-    def record_stop(self):  # 動画ファイルを閉じる
-        self.video_writer.release()
-
-    def quit(self):  # Pygameを終了
-        self.record_stop()
-        pygame.quit()
+    def quit(self):  # Pygameを終了. 画面収録を終了
+        self.video_writer.release()  # 動画ファイルを閉じる
+        pygame.quit()  # Pygameを終了
 
     def clear(self):
         self.screen.fill(CREAM)
@@ -88,22 +89,34 @@ class ScreenClass:
             self.screen, GREEN, self.field_object_coordinates["field"], 3
         )  # field
         pygame.draw.rect(
-            self.screen, RED, self.field_object_coordinates["regi1"], 0
+            self.screen, GREEN, self.field_object_coordinates["regi1"], 3
         )  # regi1
         pygame.draw.rect(
             self.screen, RED, self.field_object_coordinates["regi2"], 0
         )  # regi2
         pygame.draw.rect(
+            self.screen, SKYBLUE, self.field_object_coordinates["regi2"], 2
+        )  # regi2
+        pygame.draw.rect(
             self.screen, GRAY, self.field_object_coordinates["bar"], 0
         )  # bar
         pygame.draw.rect(
+            self.screen, SKYBLUE, self.field_object_coordinates["bar"], 2
+        )  # bar
+        pygame.draw.rect(
             self.screen, BLACK, self.field_object_coordinates["drip_coffee"], 0
-        )
+        )  # drip coffee
+        pygame.draw.rect(
+            self.screen, SKYBLUE, self.field_object_coordinates["drip_coffee"], 2
+        )  # drip coffee
         pygame.draw.rect(
             self.screen, BLUE, self.field_object_coordinates["menu"], 0
-        )  # drip coffee
+        )  # menu
+        pygame.draw.rect(
+            self.screen, SKYBLUE, self.field_object_coordinates["menu"], 2
+        )  # menu
         # テキストを描画
-        self.draw_text(text="regi 1", x=290, y=325, font_size=40, color=WHITE)
+        self.draw_text(text="regi 1", x=290, y=325, font_size=40, color=BLACK)
         self.draw_text(text="regi 2", x=390, y=325, font_size=40, color=WHITE)
         self.draw_text(text="Bar", x=650, y=350, font_size=40, color=BLACK)
         self.draw_text(text="Drip", x=460, y=515, font_size=40, color=WHITE)
