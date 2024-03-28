@@ -1,6 +1,9 @@
 import json
 import sys
 
+import matplotlib.pyplot as plt
+import numpy as np
+
 import utils.regi as regi
 
 
@@ -85,10 +88,12 @@ def analyze_result(analyzed, result):
     num_of_menued = 0  # メニューを受け取った人数
     max_waiting_regi_time = 0  # レジ待ちの最大時間
     max_waiting_bar_time = 0  # バー待ちの最大時間
+    regi_waiting_times = []  # レジ待ち時間のリスト
 
     # 各要素の処理
     for i in result:
         ave_regi_time += i["regi_time"] - i["arrive_time"]
+        regi_waiting_times.append(i["regi_time"] - i["arrive_time"])
         ave_bar_time += i["leave_time"] - i["regi_time"]
         max_waiting_regi_time = max(
             max_waiting_regi_time, i["regi_time"] - i["arrive_time"]
@@ -112,7 +117,7 @@ def analyze_result(analyzed, result):
     analyzed["max_waiting_regi_time"] = max_waiting_regi_time
     analyzed["max_waiting_bar_time"] = max_waiting_bar_time
 
-    return analyzed
+    return analyzed, regi_waiting_times
 
 
 def main():
@@ -122,7 +127,13 @@ def main():
     )  # logファイルからmeta, body, resultを取得
     analyzed = {}
     analyzed = analyze_body(analyzed, body)  # bodyを解析
-    analyzed = analyze_result(analyzed, result)  # resultを解析
+    analyzed, regi_waiting_times = analyze_result(analyzed, result)  # resultを解析
+
+    # ヒストグラムを描画
+    plt.hist(regi_waiting_times, bins=20)
+    plt.xlabel("waiting time")
+    plt.ylabel("frequency")
+    plt.show()
 
     # 解析結果を出力
     for key, value in analyzed.items():
