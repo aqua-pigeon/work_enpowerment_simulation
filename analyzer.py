@@ -6,12 +6,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from dotenv import load_dotenv
 
-import utils.regi as regi
-
 load_dotenv()
 
 
-def get_log_file_path():
+def get_log_file_path() -> str:  # コマンドライン引数からlogファイルのパスを取得
     # コマンドライン引数を受け取る
     args = sys.argv
     if len(args) != 2:
@@ -21,107 +19,140 @@ def get_log_file_path():
     return log_file_path
 
 
-def get_log_data(log_file_path):
-    # jsonファイルを開く
-    with open(log_file_path, "r") as f:
-        log = json.load(f)
-    meta = log["meta"]  # logデータ内のmetaデータを取得
-    body = log["body"]  # logデータ内
-    result = log["result"]  # logデータ内のresultデータを取得
-    return meta, body, result
+class analyzer:
+    meta: dict = None  # log/metaデータ
+    body: list = None  # log/bodyデータ
+    result: list = None  # log/resultデータ
+    analyzed: dict = {}  # 解析結果
 
+    def __init__(self, log_file_path: str) -> None:
+        # jsonファイルを開く
+        with open(log_file_path, "r") as f:
+            log = json.load(f)
+        self.meta = log["meta"]  # logデータ内のmetaデータを取得
+        self.body = log["body"]  # logデータ内
+        self.result = log["result"]  # logデータ内のresultデータを取得
 
-def analyze_body(analyzed, body):
-    analyzed["body_length"] = len(body)  # bodyの長さを出力
-    analyzed["drip_coffee_sup_count"] = body[-1]["drip_coffee_sup_count"]
-    analyzed["click"] = body[-1]["click"]
+    def analyze(self):  # logファイルを解析
+        self.analyze_meta()  # metaを解析
+        self.analyze_body()  # bodyを解析
+        self.analyze_result()  # resultを解析
+        self.get_waiting_people()  # resultから、ある時点での待ち人数を取得
 
-    return analyzed
+    def analyze_meta(self):  # metaを解析
+        self.analyzed["name"] = self.meta["name"]  # 被験者の名前を出力
 
+    def analyze_body(self):  # bodyを解析
+        self.analyzed["body_length"] = len(self.body)  # bodyの長さを出力
+        self.analyzed["drip_coffee_sup_count"] = self.body[-1][
+            "drip_coffee_sup_count"
+        ]  # ドリップコーヒー供給回数を出力
+        self.analyzed["click"] = self.body[-1]["click"]  # クリック回数を出力
+        self.analyzed["average_bar_baristaNum"] = np.mean(
+            [i["bar_baristaNum"] for i in self.body]
+        )  # バーのバリスタ数の平均を出力
+        self.analyzed["average_regi_baristaNum"] = np.mean(
+            [i["regi_baristaNum"] for i in self.body]
+        )  # レジのバリスタ数の平均を出力
+        self.analyzed["average_drip_baristaNum"] = np.mean(
+            [i["drip_baristaNum"] for i in self.body]
+        )  # ドリップのバリスタ数の平均を出力
+        self.analyzed["average_drip_meter"] = np.mean(
+            [i["drip_meter"] for i in self.body]
+        )  # ドリップメーターの平均を出力
+        self.analyzed["drip_meter_zero_count"] = len(
+            [i for i in self.body if i["drip_meter"] == 0]
+        )  # ドリップメーターが0の回数を出力
 
-def analyze_result(analyzed, result):
-    ave_regi_time = 0  # レジ時間の平均
-    ave_bar_time = 0  # バー時間の平均
-    ave_all_waiting_time = 0  # 全待ち時間の平均
-    serve_count = 0  # サーブ回数
-    num_of_people = 0  # 人数
-    num_of_menued = 0  # メニューを受け取った人数
-    max_waiting_regi_time = 0  # レジ待ちの最大時間
-    max_waiting_bar_time = 0  # バー待ちの最大時間
-    regi_waiting_times = []  # レジ待ち時間のリスト
+    def analyze_result(self):  # resultを解析
+        self.analyzed["regi_waiting_times"] = [
+            i["regi_time"] - i["arrive_time"] for i in self.result
+        ]  # レジ待ち時間を出力
+        self.analyzed["bar_waiting_times"] = [
+            i["leave_time"] - i["regi_time"] for i in self.result
+        ]  # バー待ち時間を出力
+        self.analyzed["all_waiting_times"] = [
+            i["leave_time"] - i["arrive_time"] for i in self.result
+        ]  # 全待ち時間を出力
+        self.analyzed["average_regi_time"] = np.mean(
+            self.analyzed["regi_waiting_times"]
+        )  # レジ待ち時間の平均を出力
+        self.analyzed["average_bar_time"] = np.mean(
+            self.analyzed["bar_waiting_times"]
+        )  # バー待ち時間の平均を出力
+        self.analyzed["average_all_waiting_time"] = np.mean(
+            self.analyzed["all_waiting_times"]
+        )  # 全待ち時間の平均を出力
+        self.analyzed["max_waiting_regi_time"] = np.max(
+            self.analyzed["regi_waiting_times"]
+        )  # レジ待ち時間の最大値を出力
+        self.analyzed["max_waiting_bar_time"] = np.max(
+            self.analyzed["bar_waiting_times"]
+        )  # バー待ち時間の最大値を出力
+        self.analyzed["max_waiting_all_time"] = np.max(
+            self.analyzed["all_waiting_times"]
+        )  # 全待ち時間の最大値を出力
+        self.analyzed["num_of_people"] = np.sum(
+            [i["num"] for i in self.result]
+        )  # 接客終了した人数の合計を出力
+        self.analyzed["num_of_menued"] = np.sum(
+            [i["num"] for i in self.result if i["menued"]]
+        )  # メニューを選択した人数を出力
 
-    # 各要素の処理
-    for i in result:
-        ave_regi_time += i["regi_time"] - i["arrive_time"]
-        regi_waiting_times.append(i["regi_time"] - i["arrive_time"])
-        ave_bar_time += i["leave_time"] - i["regi_time"]
-        max_waiting_regi_time = max(
-            max_waiting_regi_time, i["regi_time"] - i["arrive_time"]
-        )
-        max_waiting_bar_time = max(
-            max_waiting_bar_time, i["leave_time"] - i["regi_time"]
-        )
-        ave_all_waiting_time += i["leave_time"] - i["arrive_time"]
-        serve_count += 1
-        num_of_people += i["num"]
-        if i["menued"]:
-            num_of_menued += 1 * i["num"]
+    def get_waiting_people(self):  # resultから、ある時点での待ち人数を取得
+        simulation_time = int(os.getenv("SIMULATE_TIME"))  # シミュレーション時間
+        start_time = int(
+            self.result[0]["arrive_time"]
+        )  # 最初の人が到着する時間が0秒だから、それをスタート時間とする
+        self.analyzed["regi_waiting_people"] = [
+            0
+        ] * simulation_time  # 0秒からsimulation_time秒までのレジ待ち人数変化を格納するリスト
+        self.analyzed["bar_waiting_people"] = [
+            0
+        ] * simulation_time  # 0秒からsimulation_time秒までのバー待ち人数変化を格納するリスト
 
-    # 各要素の平均を求める
-    analyzed["ave_regi_time"] = ave_regi_time / len(result)
-    analyzed["ave_bar_time"] = ave_bar_time / len(result)
-    analyzed["ave_all_waiting_time"] = ave_all_waiting_time / len(result)
-    analyzed["serve_count"] = serve_count
-    analyzed["num_of_people"] = num_of_people
-    analyzed["num_of_menued"] = num_of_menued
-    analyzed["max_waiting_regi_time"] = max_waiting_regi_time
-    analyzed["max_waiting_bar_time"] = max_waiting_bar_time
-
-    return analyzed, regi_waiting_times
-
-
-def get_waiting_people(analyzed, result):
-    simulation_time = int(os.getenv("SIMULATE_TIME"))
-    start_time = int(result[0]["arrive_time"])
-    regi_waiting_people = [0] * simulation_time
-    bar_waiting_people = [0] * simulation_time
-    for i in range(simulation_time):
         # i+start_time秒がregi_timeとleave_timeの間にある人数を数える
-        for j in result:
-            if j["arrive_time"] <= i + start_time <= j["leave_time"]:
-                regi_waiting_people[i] += j["num"]
-            if j["regi_time"] <= i + start_time <= j["leave_time"]:
-                bar_waiting_people[i] += j["num"]
-    ave_regi_waiting_people = np.mean(regi_waiting_people)
-    ave_bar_waiting_people = np.mean(bar_waiting_people)
-    max_regi_waiting_people = max(regi_waiting_people)
-    max_bar_waiting_people = max(bar_waiting_people)
-    analyzed["ave_regi_waiting_people"] = ave_regi_waiting_people
-    analyzed["ave_bar_waiting_people"] = ave_bar_waiting_people
-    analyzed["max_regi_waiting_people"] = max_regi_waiting_people
-    analyzed["max_bar_waiting_people"] = max_bar_waiting_people
-    return analyzed
+        for i in range(simulation_time):  # 0秒からsimulation_time秒までの各秒について
+            for j in self.result:  # resultの各要素について
+                if j["arrive_time"] <= i + start_time <= j["leave_time"]:
+                    self.analyzed["regi_waiting_people"][i] += j["num"]
+                if j["regi_time"] <= i + start_time <= j["leave_time"]:
+                    self.analyzed["bar_waiting_people"][i] += j["num"]
+        self.analyzed["average_regi_waiting_people"] = np.mean(
+            self.analyzed["regi_waiting_people"]
+        )  # レジ待ち人数の平均を出力
+        self.analyzed["average_bar_waiting_people"] = np.mean(
+            self.analyzed["bar_waiting_people"]
+        )  # バー待ち人数の平均を出力
+        self.analyzed["max_regi_waiting_people"] = np.max(
+            self.analyzed["regi_waiting_people"]
+        )  # レジ待ち人数の最大値を出力
+        self.analyzed["max_bar_waiting_people"] = np.max(
+            self.analyzed["bar_waiting_people"]
+        )  # バー待ち人数の最大値を出力
 
 
-def main():
-    log_file_path = get_log_file_path()  # コマンドライン引数からlogファイルのパスを取得
-    meta, body, result = get_log_data(
-        log_file_path
-    )  # logファイルからmeta, body, resultを取得
-    analyzed = {}
-    analyzed = analyze_body(analyzed, body)  # bodyを解析
-    analyzed, regi_waiting_times = analyze_result(analyzed, result)  # resultを解析
-    analyzed = get_waiting_people(analyzed, result)  # 待ち人数を取得
-
-    # ヒストグラムを描画
-    plt.hist(regi_waiting_times, bins=20)
+def draw_regi_waiting_time_histogram(list):
+    plt.hist(list, bins=20)
     plt.xlabel("waiting time")
     plt.ylabel("frequency")
     plt.show()
 
-    # 解析結果を出力
-    for key, value in analyzed.items():
-        print(key, value)
+
+def main():
+    log_file_path = get_log_file_path()  # コマンドライン引数からlogファイルのパスを取得
+    analyzer1 = analyzer(log_file_path)  # logファイルを解析
+    analyzer1.analyze()  # 解析
+
+    # dict, list以外のデータを出力, dict, listのデータは型とshapeを出力
+    for key, value in analyzer1.analyzed.items():
+        if type(value) not in [dict, list]:
+            print(f"{key}: {value}")
+        else:
+            print(f"{key}: {type(value)}, {np.shape(value)}")
+
+    # ヒストグラムを描画
+    draw_regi_waiting_time_histogram(analyzer1.analyzed["regi_waiting_times"])
 
 
 if __name__ == "__main__":
