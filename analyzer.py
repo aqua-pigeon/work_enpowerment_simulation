@@ -19,7 +19,7 @@ def get_log_data(log_file_path):
     with open(log_file_path, "r") as f:
         log = json.load(f)
     meta = log["meta"]  # logデータ内のmetaデータを取得
-    body = log["body"]  # logデータ内のbodyデータを取得
+    body = log["body"]  # logデータ内
     result = log["result"]  # logデータ内のresultデータを取得
     return meta, body, result
 
@@ -31,6 +31,8 @@ def analyze_body(analyzed, body):
     ave_drip_baristaNum = 0
     ave_waiting_regi = 0
     ave_waiting_bar = 0
+    max_waiting_regi_people = 0  # レジ待ちの最大人数
+    max_waiting_bar_people = 0  # バー待ちの最大人数
     ave_drip_meter = 0
     ave_arrive_1_flag = 0
     ave_arrive_2_flag = 0
@@ -40,11 +42,18 @@ def analyze_body(analyzed, body):
 
     # 各要素の処理
     for i in body:
+        print(i["waiting_regi_queue"], "\n")
         ave_bar_baristaNum += i["bar_baristaNum"]
         ave_regi_baristaNum += i["regi_baristaNum"]
         ave_drip_baristaNum += i["drip_baristaNum"]
         ave_waiting_regi += regi.get_waiting_regi_num(i["waiting_regi_queue"])
         ave_waiting_bar += regi.get_waiting_regi_num(i["waiting_bar_queue"])
+        max_waiting_regi_people = max(
+            regi.get_waiting_regi_num(i["waiting_regi_queue"]), max_waiting_regi_people
+        )
+        max_waiting_bar_people = max(
+            regi.get_waiting_regi_num(i["waiting_bar_queue"]), max_waiting_bar_people
+        )
         ave_drip_meter += i["drip_meter"]
         ave_arrive_1_flag += i["arrive_1_flag"]
         ave_arrive_2_flag += i["arrive_2_flag"]
@@ -61,6 +70,9 @@ def analyze_body(analyzed, body):
     analyzed["ave_arrive_1_flag"] = ave_arrive_1_flag / len(body)
     analyzed["ave_arrive_2_flag"] = ave_arrive_2_flag / len(body)
 
+    analyzed["max_waiting_regi_people"] = max_waiting_regi_people
+    analyzed["max_waiting_bar_people"] = max_waiting_bar_people
+
     return analyzed
 
 
@@ -71,11 +83,19 @@ def analyze_result(analyzed, result):
     serve_count = 0  # サーブ回数
     num_of_people = 0  # 人数
     num_of_menued = 0  # メニューを受け取った人数
+    max_waiting_regi_time = 0  # レジ待ちの最大時間
+    max_waiting_bar_time = 0  # バー待ちの最大時間
 
     # 各要素の処理
     for i in result:
         ave_regi_time += i["regi_time"] - i["arrive_time"]
         ave_bar_time += i["leave_time"] - i["regi_time"]
+        max_waiting_regi_time = max(
+            max_waiting_regi_time, i["regi_time"] - i["arrive_time"]
+        )
+        max_waiting_bar_time = max(
+            max_waiting_bar_time, i["leave_time"] - i["regi_time"]
+        )
         ave_all_waiting_time += i["leave_time"] - i["arrive_time"]
         serve_count += 1
         num_of_people += i["num"]
@@ -89,6 +109,8 @@ def analyze_result(analyzed, result):
     analyzed["serve_count"] = serve_count
     analyzed["num_of_people"] = num_of_people
     analyzed["num_of_menued"] = num_of_menued
+    analyzed["max_waiting_regi_time"] = max_waiting_regi_time
+    analyzed["max_waiting_bar_time"] = max_waiting_bar_time
 
     return analyzed
 
