@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 import time
@@ -28,7 +29,7 @@ class JsonLogger:
         print(f"log dump: {status['elapsed_time']}")
         self.last_dump_time = int(status["elapsed_time"])
         # logデータの取得
-        log_data = status.copy()
+        log_data = copy.deepcopy(status)
         # logするデータから不要なものを削除
         log_data.pop("served")
         self.log_template["body"].append(log_data)

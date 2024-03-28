@@ -4,3 +4,4 @@ utils/__pycache__/
 .DS_Store
 log/*.json
 utils/get_api_token.py
+test.py
