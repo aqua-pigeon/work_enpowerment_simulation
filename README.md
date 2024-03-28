@@ -91,7 +91,13 @@
       pip install -r requirements.txt
   ```
 
-## log ファイルのクリア
+## log ファイルのクリア(Linux, mac)
+
+```sh
+sh log_clear.sh
+```
+
+## log ファイルのクリア(Windows)
 
 ```ps1
 Get-ChildItem -Path "log\" -Filter "*.json", "*.mp4" | ForEach-Object {
