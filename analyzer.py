@@ -141,15 +141,17 @@ def draw_regi_waiting_time_histogram(list):
 
 def main():
     log_file_path = get_log_file_path()  # コマンドライン引数からlogファイルのパスを取得
-    analyzer1 = analyzer(log_file_path)  # logファイルを解析
+    analyzer1 = analyzer(log_file_path)  # logファイルを解析するためのインスタンスを生成
     analyzer1.analyze()  # 解析
 
     # dict, list以外のデータを出力, dict, listのデータは型とshapeを出力
     for key, value in analyzer1.analyzed.items():
         if type(value) not in [dict, list]:
-            print(f"{key}: {value}")
+            print(f"{key}: {value}")  # dict, list以外のデータを出力
         else:
-            print(f"{key}: {type(value)}, {np.shape(value)}")
+            print(
+                f"{key}: {type(value)}, {np.shape(value)}"
+            )  # dict, listのデータは型とshapeを出力
 
     # ヒストグラムを描画
     draw_regi_waiting_time_histogram(analyzer1.analyzed["regi_waiting_times"])
