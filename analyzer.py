@@ -99,6 +99,7 @@ class analyzer:
             [i["num"] for i in self.result if i["menued"]]
         )  # メニューを選択した人数を出力
 
+
     def get_waiting_people(self):  # resultから、ある時点での待ち人数を取得
         simulation_time = int(os.getenv("SIMULATE_TIME"))  # シミュレーション時間
         start_time = int(
@@ -139,6 +140,55 @@ def draw_regi_waiting_time_histogram(list):
     plt.show()
 
 
+def draw_bar_waiting_time_histogram(list):# バー待ち時間のヒストグラムを描画
+    plt.hist(list, bins=20)
+    plt.xlabel("waiting time")
+    plt.ylabel("frequency")
+    plt.show()
+
+def draw_all_waiting_time_histogram(list):# 全待ち時間のヒストグラムを描画
+    plt.hist(list, bins=20)
+    plt.xlabel("waiting time")
+    plt.ylabel("frequency")
+    plt.show()
+
+def draw_regi_waiting_people_graph(list):# レジ待ち人数の時系列グラフを描画
+    plt.plot(list)
+    plt.xlabel("time")
+    plt.ylabel("waiting people")
+    plt.show()
+
+def draw_bar_waiting_people_graph(list):# バー待ち人数の時系列グラフを描画
+    plt.plot(list)
+    plt.xlabel("time")
+    plt.ylabel("waiting people")
+    plt.show()
+    
+#メニューを渡された人数の時系列変化をレジの待ち人数の時系列変化と比較してグラフに描画
+def draw_menued_people_graph(regi_waiting_people, menued_people):
+    plt.plot(regi_waiting_people, label="regi_waiting_people")
+    plt.plot(menued_people, label="menued_people")
+    plt.xlabel("time")
+    plt.ylabel("people")
+    plt.legend()
+    plt.show()
+
+#レジの平均待ち時間と平均待ち人数、バーの平均待ち時間と平均待ち人数、全体の平均待ち時間と平均待ち人数を比較してグラフに描画
+def draw_waiting_time_and_people_graph(regi_waiting_times, regi_waiting_people, bar_waiting_times, bar_waiting_people, all_waiting_times, all_waiting_people):
+    plt.plot(regi_waiting_times, label="regi_waiting_times")
+    plt.plot(regi_waiting_people, label="regi_waiting_people")
+    plt.plot(bar_waiting_times, label="bar_waiting_times")
+    plt.plot(bar_waiting_people, label="bar_waiting_people")
+    plt.plot(all_waiting_times, label="all_waiting_times")
+    plt.plot(all_waiting_people, label="all_waiting_people")
+    plt.xlabel("time")
+    plt.ylabel("people")
+    plt.legend()
+    plt.show()
+
+    
+    
+    
 def main():
     log_file_path = get_log_file_path()  # コマンドライン引数からlogファイルのパスを取得
     analyzer1 = analyzer(log_file_path)  # logファイルを解析するためのインスタンスを生成
@@ -155,7 +205,15 @@ def main():
 
     # ヒストグラムを描画
     draw_regi_waiting_time_histogram(analyzer1.analyzed["regi_waiting_times"])
+    draw_bar_waiting_time_histogram(analyzer1.analyzed["bar_waiting_times"])
+    draw_all_waiting_time_histogram(analyzer1.analyzed["all_waiting_times"])
 
+    # 時系列グラフを描画
+    draw_regi_waiting_people_graph(analyzer1.analyzed["regi_waiting_people"])
+    draw_bar_waiting_people_graph(analyzer1.analyzed["bar_waiting_people"])
+    draw_menued_people_graph(analyzer1.analyzed["regi_waiting_people"], analyzer1.analyzed["bar_waiting_people"])
+    draw_waiting_time_and_people_graph(analyzer1.analyzed["regi_waiting_times"], analyzer1.analyzed["regi_waiting_people"], analyzer1.analyzed["bar_waiting_times"], analyzer1.analyzed["bar_waiting_people"], analyzer1.analyzed["all_waiting_times"], analyzer1.analyzed["all_waiting_people"])
+    
 
 if __name__ == "__main__":
     main()
