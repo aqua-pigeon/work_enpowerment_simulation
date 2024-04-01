@@ -238,26 +238,40 @@ def main():
     log_file_paths = [
         ["OkadaYuro_20240327_224548.json", 1],
         ["aika_kishigami_20240328_151935.json", 1],
-        ["aya_nagao_20240328_133350.json", 1],
-        ["emi_tokura_20240326_230137.json", 1],
+        ["aya_nagao_20240328_133350.json", 2],
+        ["emi_tokura_20240326_230137.json", 3],
         ["kai_watanabe_20240328_104528.json", 2],
-        ["kano_nisimura_20240327_092226.json", 2],
-        ["kenta_ano_20240327_182046.json", 2],
-        ["mayu_kurozumi_20240327_170252.json", 3],
-        ["mina_20240328_121042.json", 3],
+        ["kano_nisimura_20240327_092226.json", 1],
+        ["kenta_ano_20240327_182046.json", 3],
+        ["mayu_kurozumi_20240327_170252.json", 1],
+        ["mina_20240328_121042.json", 1],
         ["miu_furuya_20240327_182046.json", 3],
         ["naoki_akanuma_20240327_153844.json", 3],
-        ["tokura_yutaka_20240326_222413.json", 3],
-        ["yuta_matusita_20240327_161356.json", 1],
+        ["tokura_yutaka_20240326_222413.json", 2],
+        ["20240326_165507_kento_tokura.json", 2],
+        ["yuta_matusita_20240327_161356.json", 2],
         ["亀田あずさ_20240327_135457.json", 1],
+        # ["20240326_152249_かなでさん.json", 2],
+        # ["20240323_163556_kiyo furukawa (2).json", 1],
+        # ["20240323_123243_hamana shodai.json", 3],
+        # ["20240325_224219_sigenobu.json", 3],
+        # ["20240323_225932_naoko.json", 1],
+        # ["20240321_105655_井野千恋莉 (1).json",3],
     ]
-
-    num_of_people_dict = {"1": [], "2": [], "3": []}  # 人数のリストを格納する辞書
-    regi_waiting_times_dict = {
+    analyzed_per_discretion_level = {
         "1": [],
         "2": [],
         "3": [],
-    }  # レジ待ち時間のリストを格納する辞書
+    }  # analyzedをdiscretion_levelごとに格納する辞書
+    analyzed_list = []
+
+    # num_of_people_dict = {"1": [], "2": [], "3": []}  # 人数のリストを格納する辞書
+
+    # regi_waiting_times_dict = {
+    #     "1": [],
+    #     "2": [],
+    #     "3": [],
+    # }  # レジ待ち時間のリストを格納する辞書
 
     for i in log_file_paths:
         file_name = i[0]
@@ -266,24 +280,40 @@ def main():
             "analyze_target/" + file_name
         )  # logファイルを解析するためのインスタンスを生成
         analyzed = target.analyze()
-        num_of_people_dict[str(discretion_level)].append(analyzed["num_of_people"])
-        regi_waiting_times_dict[str(discretion_level)].extend(
-            analyzed["regi_waiting_times"]
-        )  # レジ待ち時間のリストを格納
+        analyzed_list.append(analyzed)  # analyzedをリストに格納
 
-    draw_bar_waiting_time_histogram(
-        regi_waiting_times_dict
-    )  # レジ待ち時間のヒストグラムを描画
+        # analyzedの各要素をdiscretion_levelごとに格納
+        for key, value in analyzed:
+            if analyzed_per_discretion_level[str(discretion_level)][key] == None:
+                analyzed_per_discretion_level[str(discretion_level)][key] = []
+            analyzed_per_discretion_level[str(discretion_level)][key].append(value)
+
+        # num_of_people_dict[str(discretion_level)].append(
+        #     {"from": analyzed["name"], "value": analyzed["num_of_people"]}
+        # )
+        # num_of_people_dict[str(discretion_level)].append(analyzed["num_of_people"])
+        # regi_waiting_times_dict[str(discretion_level)].append(
+        #     analyzed["max_waiting_regi_time"]
+        # )
+        # num_of_people_dict[str(discretion_level)].append(analyzed["_people"])
+
+        # regi_waiting_times_dict[str(discretion_level)].extend(
+        #     analyzed["regi_waiting_times"]
+        # )  # レジ待ち時間のリストを格納
+    print(num_of_people_dict)
     # draw_num_of_people(num_of_people_dict, "num_of_people")
 
-    # # dict, list以外のデータを出力, dict, listのデータは型とshapeを出力
-    # for key, value in analyzed.items():
-    #     if type(value) not in [dict, list]:
-    #         print(f"{key}: {value}")  # dict, list以外のデータを出力
-    #     else:
-    #         print(
-    #             f"{key}: {type(value)}, {np.shape(value)}"
-    #         )  # dict, listのデータは型とshapeを出力
+    # dict, list以外のデータを出力, dict, listのデータは型とshapeを出力
+    # log_file_pathごとに解析結果を出力
+
+    for key, value in analyzed.items():
+        if type(value) not in [dict, list]:
+            print(f"{key}: {value}")  # dict, list以外のデータを出力
+        else:
+            print(
+                f"{key}: {type(value)}, {np.shape(value)}"
+            )  # dict, listのデータは型とshapeを出力
+
     # draw_regi_waiting_time_histogram(
     #     analyzed["regi_waiting_times"], analyzed["name"]
     # )
