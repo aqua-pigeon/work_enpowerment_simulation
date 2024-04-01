@@ -259,9 +259,9 @@ def main():
         # ["20240321_105655_井野千恋莉 (1).json",3],
     ]
     analyzed_per_discretion_level = {
-        "1": [],
-        "2": [],
-        "3": [],
+        "1": {},
+        "2": {},
+        "3": {},
     }  # analyzedをdiscretion_levelごとに格納する辞書
     analyzed_list = []
 
@@ -283,36 +283,48 @@ def main():
         analyzed_list.append(analyzed)  # analyzedをリストに格納
 
         # analyzedの各要素をdiscretion_levelごとに格納
-        for key, value in analyzed:
-            if analyzed_per_discretion_level[str(discretion_level)][key] == None:
+        for key, value in analyzed.items():
+            if analyzed_per_discretion_level[str(discretion_level)].get(key) is None:
                 analyzed_per_discretion_level[str(discretion_level)][key] = []
-            analyzed_per_discretion_level[str(discretion_level)][key].append(value)
+            if type(value) in [dict, list]:
+                analyzed_per_discretion_level[str(discretion_level)][key].extend(
+                    value
+                )  # dict, listの場合はextend
+            else:
+                analyzed_per_discretion_level[str(discretion_level)][key].append(
+                    value
+                )  # dict, list以外の場合はappend
 
-        # num_of_people_dict[str(discretion_level)].append(
-        #     {"from": analyzed["name"], "value": analyzed["num_of_people"]}
-        # )
-        # num_of_people_dict[str(discretion_level)].append(analyzed["num_of_people"])
-        # regi_waiting_times_dict[str(discretion_level)].append(
-        #     analyzed["max_waiting_regi_time"]
-        # )
-        # num_of_people_dict[str(discretion_level)].append(analyzed["_people"])
+    # discretion_level = 1 の人のレジ待ち時間の平均
+    print(np.mean(analyzed_per_discretion_level["1"]["regi_waiting_times"]))
+    # discretion_level = 2 の人のレジ待ち時間の平均
+    print(np.mean(analyzed_per_discretion_level["2"]["regi_waiting_times"]))
 
-        # regi_waiting_times_dict[str(discretion_level)].extend(
-        #     analyzed["regi_waiting_times"]
-        # )  # レジ待ち時間のリストを格納
-    print(num_of_people_dict)
+    # num_of_people_dict[str(discretion_level)].append(
+    #     {"from": analyzed["name"], "value": analyzed["num_of_people"]}
+    # )
+    # num_of_people_dict[str(discretion_level)].append(analyzed["num_of_people"])
+    # regi_waiting_times_dict[str(discretion_level)].append(
+    #     analyzed["max_waiting_regi_time"]
+    # )
+    # num_of_people_dict[str(discretion_level)].append(analyzed["_people"])
+
+    # regi_waiting_times_dict[str(discretion_level)].extend(
+    #     analyzed["regi_waiting_times"]
+    # )  # レジ待ち時間のリストを格納
+
     # draw_num_of_people(num_of_people_dict, "num_of_people")
 
     # dict, list以外のデータを出力, dict, listのデータは型とshapeを出力
     # log_file_pathごとに解析結果を出力
 
-    for key, value in analyzed.items():
-        if type(value) not in [dict, list]:
-            print(f"{key}: {value}")  # dict, list以外のデータを出力
-        else:
-            print(
-                f"{key}: {type(value)}, {np.shape(value)}"
-            )  # dict, listのデータは型とshapeを出力
+    # for key, value in analyzed.items():
+    #     if type(value) not in [dict, list]:
+    #         print(f"{key}: {value}")  # dict, list以外のデータを出力
+    #     else:
+    #         print(
+    #             f"{key}: {type(value)}, {np.shape(value)}"
+    #         )  # dict, listのデータは型とshapeを出力
 
     # draw_regi_waiting_time_histogram(
     #     analyzed["regi_waiting_times"], analyzed["name"]
