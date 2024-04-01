@@ -203,7 +203,7 @@ def draw_waiting_time_and_people_graph(
     plt.show()
 
 
-def draw_num_of_people(num_of_people_dict, filename):
+def draw_num_of_people(num_of_people_dict, file_name):
     # num_of_people_dictのキーごとに色分けし、分布図を描画
     # num_of_people_dictのvalueはリスト。
     # xは累積の要素番号、yはその要素番号に対応するリストの要素
@@ -213,7 +213,23 @@ def draw_num_of_people(num_of_people_dict, filename):
     plt.xlabel("num_of_people")
     plt.ylabel("frequency")
     plt.legend()
-    plt.savefig("analyze_result/" + filename + "_num_of_people.png")
+    plt.savefig("analyze_result/" + file_name + ".png")
+
+
+def draw_bar_waiting_time_histogram(
+    data_dict,
+):  # バー待ち時間のヒストグラムを描画. data_dictは{discretion_level: [bar_waiting_times]}の形式
+    # data_dictのキーごとに色分けし、分布図を描画
+    # data_dictのvalueはリスト。
+    # y軸はリスト内の要素の数ではなく,0-1の間で正規化したリスト内頻度
+
+    for key, value in data_dict.items():
+        plt.hist(value, bins=20, alpha=0.5, label=key, density=True)
+    plt.xlabel("bar_waiting_times")
+    plt.ylabel("frequency")
+    plt.legend()
+
+    plt.savefig("analyze_result/bar_waiting_times.png")
 
 
 def main():
@@ -254,7 +270,10 @@ def main():
         regi_waiting_times_dict[str(discretion_level)].extend(
             analyzed["regi_waiting_times"]
         )  # レジ待ち時間のリストを格納
-    print(regi_waiting_times_dict)
+
+    draw_bar_waiting_time_histogram(
+        regi_waiting_times_dict
+    )  # レジ待ち時間のヒストグラムを描画
     # draw_num_of_people(num_of_people_dict, "num_of_people")
 
     # # dict, list以外のデータを出力, dict, listのデータは型とshapeを出力
