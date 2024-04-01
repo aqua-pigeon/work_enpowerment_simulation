@@ -38,6 +38,7 @@ class analyzer:
         self.analyze_body()  # bodyを解析
         self.analyze_result()  # resultを解析
         self.get_waiting_people()  # resultから、ある時点での待ち人数を取得
+        return self.analyzed
 
     def analyze_meta(self):  # metaを解析
         self.analyzed["name"] = self.meta["name"]  # 被験者の名前を出力
@@ -99,7 +100,6 @@ class analyzer:
             [i["num"] for i in self.result if i["menued"]]
         )  # メニューを選択した人数を出力
 
-
     def get_waiting_people(self):  # resultから、ある時点での待ち人数を取得
         simulation_time = int(os.getenv("SIMULATE_TIME"))  # シミュレーション時間
         start_time = int(
@@ -133,38 +133,46 @@ class analyzer:
         )  # バー待ち人数の最大値を出力
 
 
-def draw_regi_waiting_time_histogram(list):
+def draw_regi_waiting_time_histogram(
+    list, filename
+):  # レジ待ち時間のヒストグラムを描画
+    plt.hist(list, bins=20)
+    plt.xlabel("regi_waiting_times")
+    plt.ylabel("frequency")
+
+    # plt.show()
+    plt.savefig("analyze_result/" + filename + "_regi_waiting_times.png")
+
+
+def draw_bar_waiting_time_histogram(list):  # バー待ち時間のヒストグラムを描画
+    plt.hist(list, bins=20)
+    plt.xlabel("bar_waiting_times")
+    plt.ylabel("frequency")
+    plt.show()
+
+
+def draw_all_waiting_time_histogram(list):  # 全待ち時間のヒストグラムを描画
     plt.hist(list, bins=20)
     plt.xlabel("waiting time")
     plt.ylabel("frequency")
     plt.show()
 
 
-def draw_bar_waiting_time_histogram(list):# バー待ち時間のヒストグラムを描画
-    plt.hist(list, bins=20)
-    plt.xlabel("waiting time")
-    plt.ylabel("frequency")
-    plt.show()
-
-def draw_all_waiting_time_histogram(list):# 全待ち時間のヒストグラムを描画
-    plt.hist(list, bins=20)
-    plt.xlabel("waiting time")
-    plt.ylabel("frequency")
-    plt.show()
-
-def draw_regi_waiting_people_graph(list):# レジ待ち人数の時系列グラフを描画
+def draw_regi_waiting_people_graph(list):  # レジ待ち人数の時系列グラフを描画
     plt.plot(list)
     plt.xlabel("time")
     plt.ylabel("waiting people")
     plt.show()
 
-def draw_bar_waiting_people_graph(list):# バー待ち人数の時系列グラフを描画
+
+def draw_bar_waiting_people_graph(list):  # バー待ち人数の時系列グラフを描画
     plt.plot(list)
     plt.xlabel("time")
     plt.ylabel("waiting people")
     plt.show()
-    
-#メニューを渡された人数の時系列変化をレジの待ち人数の時系列変化と比較してグラフに描画
+
+
+# メニューを渡された人数の時系列変化をレジの待ち人数の時系列変化と比較してグラフに描画
 def draw_menued_people_graph(regi_waiting_people, menued_people):
     plt.plot(regi_waiting_people, label="regi_waiting_people")
     plt.plot(menued_people, label="menued_people")
@@ -173,8 +181,16 @@ def draw_menued_people_graph(regi_waiting_people, menued_people):
     plt.legend()
     plt.show()
 
-#レジの平均待ち時間と平均待ち人数、バーの平均待ち時間と平均待ち人数、全体の平均待ち時間と平均待ち人数を比較してグラフに描画
-def draw_waiting_time_and_people_graph(regi_waiting_times, regi_waiting_people, bar_waiting_times, bar_waiting_people, all_waiting_times, all_waiting_people):
+
+# レジの平均待ち時間と平均待ち人数、バーの平均待ち時間と平均待ち人数、全体の平均待ち時間と平均待ち人数を比較してグラフに描画
+def draw_waiting_time_and_people_graph(
+    regi_waiting_times,
+    regi_waiting_people,
+    bar_waiting_times,
+    bar_waiting_people,
+    all_waiting_times,
+    all_waiting_people,
+):
     plt.plot(regi_waiting_times, label="regi_waiting_times")
     plt.plot(regi_waiting_people, label="regi_waiting_people")
     plt.plot(bar_waiting_times, label="bar_waiting_times")
@@ -186,34 +202,84 @@ def draw_waiting_time_and_people_graph(regi_waiting_times, regi_waiting_people, 
     plt.legend()
     plt.show()
 
-    
-    
-    
-def main():
-    log_file_path = get_log_file_path()  # コマンドライン引数からlogファイルのパスを取得
-    analyzer1 = analyzer(log_file_path)  # logファイルを解析するためのインスタンスを生成
-    analyzer1.analyze()  # 解析
 
-    # dict, list以外のデータを出力, dict, listのデータは型とshapeを出力
-    for key, value in analyzer1.analyzed.items():
-        if type(value) not in [dict, list]:
-            print(f"{key}: {value}")  # dict, list以外のデータを出力
-        else:
-            print(
-                f"{key}: {type(value)}, {np.shape(value)}"
-            )  # dict, listのデータは型とshapeを出力
+def draw_num_of_people(num_of_people_dict, filename):
+    # num_of_people_dictのキーごとに色分けし、分布図を描画
+    # num_of_people_dictのvalueはリスト。
+    # xは累積の要素番号、yはその要素番号に対応するリストの要素
+
+    for key, value in num_of_people_dict.items():
+        plt.hist(value, bins=10, alpha=0.5, label=key)
+    plt.xlabel("num_of_people")
+    plt.ylabel("frequency")
+    plt.legend()
+    plt.savefig("analyze_result/" + filename + "_num_of_people.png")
+
+
+def main():
+    # log_file_path = get_log_file_path()  # コマンドライン引数からlogファイルのパスを取得
+    # analyzer1 = analyzer(log_file_path)  # logファイルを解析するためのインスタンスを生成
+    log_file_paths = [
+        ["OkadaYuro_20240327_224548.json", 1],
+        ["aika_kishigami_20240328_151935.json", 1],
+        ["aya_nagao_20240328_133350.json", 1],
+        ["emi_tokura_20240326_230137.json", 1],
+        ["kai_watanabe_20240328_104528.json", 2],
+        ["kano_nisimura_20240327_092226.json", 2],
+        ["kenta_ano_20240327_182046.json", 2],
+        ["mayu_kurozumi_20240327_170252.json", 3],
+        ["mina_20240328_121042.json", 3],
+        ["miu_furuya_20240327_182046.json", 3],
+        ["naoki_akanuma_20240327_153844.json", 3],
+        ["tokura_yutaka_20240326_222413.json", 3],
+        ["yuta_matusita_20240327_161356.json", 1],
+        ["亀田あずさ_20240327_135457.json", 1],
+    ]
+
+    num_of_people_dict = {"1": [], "2": [], "3": []}  # 人数のリストを格納する辞書
+    regi_waiting_times_dict = {
+        "1": [],
+        "2": [],
+        "3": [],
+    }  # レジ待ち時間のリストを格納する辞書
+
+    for i in log_file_paths:
+        file_name = i[0]
+        discretion_level = i[1]
+        target = analyzer(
+            "analyze_target/" + file_name
+        )  # logファイルを解析するためのインスタンスを生成
+        analyzed = target.analyze()
+        num_of_people_dict[str(discretion_level)].append(analyzed["num_of_people"])
+        regi_waiting_times_dict[str(discretion_level)].extend(
+            analyzed["regi_waiting_times"]
+        )  # レジ待ち時間のリストを格納
+    print(regi_waiting_times_dict)
+    # draw_num_of_people(num_of_people_dict, "num_of_people")
+
+    # # dict, list以外のデータを出力, dict, listのデータは型とshapeを出力
+    # for key, value in analyzed.items():
+    #     if type(value) not in [dict, list]:
+    #         print(f"{key}: {value}")  # dict, list以外のデータを出力
+    #     else:
+    #         print(
+    #             f"{key}: {type(value)}, {np.shape(value)}"
+    #         )  # dict, listのデータは型とshapeを出力
+    # draw_regi_waiting_time_histogram(
+    #     analyzed["regi_waiting_times"], analyzed["name"]
+    # )
 
     # ヒストグラムを描画
-    draw_regi_waiting_time_histogram(analyzer1.analyzed["regi_waiting_times"])
-    draw_bar_waiting_time_histogram(analyzer1.analyzed["bar_waiting_times"])
-    draw_all_waiting_time_histogram(analyzer1.analyzed["all_waiting_times"])
+    # draw_regi_waiting_time_histogram(analyzer1.analyzed["regi_waiting_times"])
+    # draw_bar_waiting_time_histogram(analyzer1.analyzed["bar_waiting_times"])
+    # draw_all_waiting_time_histogram(analyzer1.analyzed["all_waiting_times"])
 
-    # 時系列グラフを描画
-    draw_regi_waiting_people_graph(analyzer1.analyzed["regi_waiting_people"])
-    draw_bar_waiting_people_graph(analyzer1.analyzed["bar_waiting_people"])
-    draw_menued_people_graph(analyzer1.analyzed["regi_waiting_people"], analyzer1.analyzed["bar_waiting_people"])
-    draw_waiting_time_and_people_graph(analyzer1.analyzed["regi_waiting_times"], analyzer1.analyzed["regi_waiting_people"], analyzer1.analyzed["bar_waiting_times"], analyzer1.analyzed["bar_waiting_people"], analyzer1.analyzed["all_waiting_times"], analyzer1.analyzed["all_waiting_people"])
-    
+    # # 時系列グラフを描画
+    # draw_regi_waiting_people_graph(analyzer1.analyzed["regi_waiting_people"])
+    # draw_bar_waiting_people_graph(analyzer1.analyzed["bar_waiting_people"])
+    # draw_menued_people_graph(analyzer1.analyzed["regi_waiting_people"], analyzer1.analyzed["bar_waiting_people"])
+    # draw_waiting_time_and_people_graph(analyzer1.analyzed["regi_waiting_times"], analyzer1.analyzed["regi_waiting_people"], analyzer1.analyzed["bar_waiting_times"], analyzer1.analyzed["bar_waiting_people"], analyzer1.analyzed["all_waiting_times"], analyzer1.analyzed["all_waiting_people"])
+
 
 if __name__ == "__main__":
     main()
