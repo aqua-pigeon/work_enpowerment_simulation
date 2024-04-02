@@ -228,7 +228,9 @@ def draw_bar_waiting_time_histogram(
     # y軸はリスト内の要素の数ではなく,0-1の間で正規化したリスト内頻度
 
     for key, value in data_dict.items():
-        plt.hist(value, bins=20, alpha=0.5, label=key, density=True)
+        plt.hist(
+            value["bar_waiting_times"], bins=20, alpha=0.5, label=key, density=True
+        )
     plt.xlabel("bar_waiting_times")
     plt.ylabel("frequency")
     plt.legend()
@@ -242,6 +244,8 @@ def draw_regi_waiting_time_histogram(
     # data_dictのキーごとに色分けし、分布図を描画
     # data_dictのvalueはリスト。
     # y軸はリスト内の要素の数ではなく,0-1の間で正規化したリスト内頻度
+
+    plt.clf()
 
     for key, value in data_dict.items():
         plt.hist(value, bins=20, alpha=0.5, label=key, density=True)
@@ -315,13 +319,7 @@ def main():
                     value
                 )  # dict, list以外の場合はappend
 
-    draw_bar_waiting_time_histogram(
-        {
-            "1": analyzed_per_discretion_level["1"]["bar_waiting_times"],
-            "2": analyzed_per_discretion_level["2"]["bar_waiting_times"],
-            "3": analyzed_per_discretion_level["3"]["bar_waiting_times"],
-        }
-    )
+    draw_bar_waiting_time_histogram(analyzed_per_discretion_level)
 
     draw_regi_waiting_time_histogram(
         {
@@ -330,7 +328,6 @@ def main():
             "3": analyzed_per_discretion_level["3"]["regi_waiting_times"],
         }
     )
-
 
     # discretion_level = 1 の人のレジ待ち時間の平均
     print(np.mean(analyzed_per_discretion_level["1"]["regi_waiting_times"]))
