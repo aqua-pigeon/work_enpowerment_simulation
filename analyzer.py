@@ -156,6 +156,8 @@ class analyzer:
 
 
 def draw_all_waiting_time_histogram(list):  # 全待ち時間のヒストグラムを描画
+    plt.clf()  # グラフを初期化
+
     plt.hist(list, bins=20)
     plt.xlabel("waiting time")
     plt.ylabel("frequency")
@@ -163,6 +165,8 @@ def draw_all_waiting_time_histogram(list):  # 全待ち時間のヒストグラ�
 
 
 def draw_regi_waiting_people_graph(list):  # レジ待ち人数の時系列グラフを描画
+    plt.clf()  # グラフを初期化
+
     plt.plot(list)
     plt.xlabel("time")
     plt.ylabel("waiting people")
@@ -170,6 +174,8 @@ def draw_regi_waiting_people_graph(list):  # レジ待ち人数の時系列グ�
 
 
 def draw_bar_waiting_people_graph(list):  # バー待ち人数の時系列グラフを描画
+    plt.clf()  # グラフを初期化
+
     plt.plot(list)
     plt.xlabel("time")
     plt.ylabel("waiting people")
@@ -178,6 +184,8 @@ def draw_bar_waiting_people_graph(list):  # バー待ち人数の時系列グラ
 
 # メニューを渡された人数の時系列変化をレジの待ち人数の時系列変化と比較してグラフに描画
 def draw_menued_people_graph(regi_waiting_people, menued_people):
+    plt.clf()  # グラフを初期化
+
     plt.plot(regi_waiting_people, label="regi_waiting_people")
     plt.plot(menued_people, label="menued_people")
     plt.xlabel("time")
@@ -195,6 +203,8 @@ def draw_waiting_time_and_people_graph(
     all_waiting_times,
     all_waiting_people,
 ):
+    plt.clf()  # グラフを初期化
+
     plt.plot(regi_waiting_times, label="regi_waiting_times")
     plt.plot(regi_waiting_people, label="regi_waiting_people")
     plt.plot(bar_waiting_times, label="bar_waiting_times")
@@ -212,6 +222,8 @@ def draw_num_of_people(num_of_people_dict, file_name):
     # num_of_people_dictのvalueはリスト。
     # xは累積の要素番号、yはその要素番号に対応するリストの要素
 
+    plt.clf()  # グラフを初期化
+
     for key, value in num_of_people_dict.items():
         plt.hist(value, bins=10, alpha=0.5, label=key)
     plt.xlabel("num_of_people")
@@ -226,6 +238,8 @@ def draw_bar_waiting_time_histogram(
     # data_dictのキーごとに色分けし、分布図を描画
     # data_dictのvalueはリスト。
     # y軸はリスト内の要素の数ではなく,0-1の間で正規化したリスト内頻度
+
+    plt.clf()  # グラフを初期化
 
     for key, value in data_dict.items():
         plt.hist(
@@ -245,7 +259,7 @@ def draw_regi_waiting_time_histogram(
     # data_dictのvalueはリスト。
     # y軸はリスト内の要素の数ではなく,0-1の間で正規化したリスト内頻度
 
-    plt.clf()
+    plt.clf()  # グラフを初期化
 
     for key, value in data_dict.items():
         plt.hist(value, bins=20, alpha=0.5, label=key, density=True)
