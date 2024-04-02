@@ -133,22 +133,26 @@ class analyzer:
         )  # バー待ち人数の最大値を出力
 
 
-def draw_regi_waiting_time_histogram(
-    list, filename
-):  # レジ待ち時間のヒストグラムを描画
-    plt.hist(list, bins=20)
-    plt.xlabel("regi_waiting_times")
-    plt.ylabel("frequency")
+# def draw_regi_waiting_time_histogram(
+#     list, filename
+# ):  # レジ待ち時間のヒストグラムを描画
+#     plt.hist(list, bins=20)
+#     plt.xlabel("regi_waiting_times")
+#     plt.ylabel("frequency")
 
-    # plt.show()
-    plt.savefig("analyze_result/" + filename + "_regi_waiting_times.png")
+#     # plt.show()
+#     plt.savefig("analyze_result/" + filename + "_regi_waiting_times.png")
 
 
-def draw_bar_waiting_time_histogram(list):  # バー待ち時間のヒストグラムを描画
-    plt.hist(list, bins=20)
-    plt.xlabel("bar_waiting_times")
-    plt.ylabel("frequency")
-    plt.show()
+# def draw_bar_waiting_time_histogram(
+#     list, filename
+# ):  # レジ待ち時間のヒストグラムを描画
+#     plt.hist(list, bins=20)
+#     plt.xlabel("bar_waiting_times")
+#     plt.ylabel("frequency")
+
+#     # plt.show()
+#     plt.savefig("analyze_result/" + filename + "_bar_waiting_times.png")
 
 
 def draw_all_waiting_time_histogram(list):  # 全待ち時間のヒストグラムを描画
@@ -232,6 +236,22 @@ def draw_bar_waiting_time_histogram(
     plt.savefig("analyze_result/bar_waiting_times.png")
 
 
+def draw_regi_waiting_time_histogram(
+    data_dict,
+):  # バー待ち時間のヒストグラムを描画. data_dictは{discretion_level: [bar_waiting_times]}の形式
+    # data_dictのキーごとに色分けし、分布図を描画
+    # data_dictのvalueはリスト。
+    # y軸はリスト内の要素の数ではなく,0-1の間で正規化したリスト内頻度
+
+    for key, value in data_dict.items():
+        plt.hist(value, bins=20, alpha=0.5, label=key, density=True)
+    plt.xlabel("regi_waiting_times")
+    plt.ylabel("frequency")
+    plt.legend()
+
+    plt.savefig("analyze_result/regi_waiting_times.png")
+
+
 def main():
     # log_file_path = get_log_file_path()  # コマンドライン引数からlogファイルのパスを取得
     # analyzer1 = analyzer(log_file_path)  # logファイルを解析するためのインスタンスを生成
@@ -251,10 +271,10 @@ def main():
         ["20240326_165507_kento_tokura.json", 2],
         ["yuta_matusita_20240327_161356.json", 2],
         ["亀田あずさ_20240327_135457.json", 1],
-        # ["20240326_152249_かなでさん.json", 2],
-        # ["20240323_163556_kiyo furukawa (2).json", 1],
-        # ["20240323_123243_hamana shodai.json", 3],
-        # ["20240325_224219_sigenobu.json", 3],
+        ["20240326_152249_かなでさん.json", 2],
+        ["20240323_163556_kiyo furukawa (2).json", 1],
+        ["20240323_123243_hamana shodai.json", 3],
+        ["20240325_224219_sigenobu.json", 3],
         # ["20240323_225932_naoko.json", 1],
         # ["20240321_105655_井野千恋莉 (1).json",3],
     ]
@@ -295,10 +315,30 @@ def main():
                     value
                 )  # dict, list以外の場合はappend
 
+    draw_bar_waiting_time_histogram(
+        {
+            "1": analyzed_per_discretion_level["1"]["bar_waiting_times"],
+            "2": analyzed_per_discretion_level["2"]["bar_waiting_times"],
+            "3": analyzed_per_discretion_level["3"]["bar_waiting_times"],
+        }
+    )
+
+    draw_regi_waiting_time_histogram(
+        {
+            "1": analyzed_per_discretion_level["1"]["regi_waiting_times"],
+            "2": analyzed_per_discretion_level["2"]["regi_waiting_times"],
+            "3": analyzed_per_discretion_level["3"]["regi_waiting_times"],
+        }
+    )
+
+
     # discretion_level = 1 の人のレジ待ち時間の平均
     print(np.mean(analyzed_per_discretion_level["1"]["regi_waiting_times"]))
     # discretion_level = 2 の人のレジ待ち時間の平均
     print(np.mean(analyzed_per_discretion_level["2"]["regi_waiting_times"]))
+
+    # drip_meterの平均値を求める
+    print(np.mean([i["average_drip_meter"] for i in analyzed_list]))
 
     # num_of_people_dict[str(discretion_level)].append(
     #     {"from": analyzed["name"], "value": analyzed["num_of_people"]}
@@ -326,8 +366,8 @@ def main():
     #             f"{key}: {type(value)}, {np.shape(value)}"
     #         )  # dict, listのデータは型とshapeを出力
 
-    # draw_regi_waiting_time_histogram(
-    #     analyzed["regi_waiting_times"], analyzed["name"]
+    # draw_bar_waiting_time_histogram(
+    #     analyzed["bar_waiting_times"], analyzed["name"]
     # )
 
     # ヒストグラムを描画
