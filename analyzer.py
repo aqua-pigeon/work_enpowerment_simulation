@@ -64,6 +64,7 @@ class analyzer:
         self.analyzed["drip_meter_zero_count"] = len(
             [i for i in self.body if i["drip_meter"] == 0]
         )  # ドリップメーターが0の回数を出力
+       
 
     def analyze_result(self):  # resultを解析
         self.analyzed["regi_waiting_times"] = [
@@ -262,12 +263,54 @@ def draw_regi_waiting_time_histogram(
     plt.clf()  # グラフを初期化
 
     for key, value in data_dict.items():
-        plt.hist(value, bins=20, alpha=0.5, label=key, density=True)
+        plt.hist(
+            value["regi_waiting_times"],
+            bins=20,
+            alpha=0.5,
+            label=key,
+            density=True,
+        )
     plt.xlabel("regi_waiting_times")
     plt.ylabel("frequency")
     plt.legend()
 
     plt.savefig("analyze_result/regi_waiting_times.png")
+
+
+def draw_all_waiting_time_histogram(
+    data_dict,
+):  # バー待ち時間のヒストグラムを描画. data_dictは{discretion_level: [bar_waiting_times]}の形式
+    # data_dictのキーごとに色分けし、分布図を描画
+    # data_dictのvalueはリスト。
+    # y軸はリスト内の要素の数ではなく,0-1の間で正規化したリスト内頻度
+
+    plt.clf()  # グラフを初期化
+
+    for key, value in data_dict.items():
+        plt.hist(
+            value["all_waiting_times"],
+            bins=20,
+            alpha=0.5,
+            label=key,
+            density=True,
+        )
+    plt.xlabel("all_waiting_times")
+    plt.ylabel("frequency")
+    plt.legend()
+
+    plt.savefig("analyze_result/all_waiting_times.png")
+
+
+
+def draw_drip_meter_histgram(list):
+    plt.clf()  # グラフを初期化
+
+    for key in list():
+        plt.hist(["drip_meter"], bins=20, alpha=0.5, label=value["name"])
+    plt.xlabel("drip_meter")
+    plt.ylabel("frequency")
+    plt.legend()
+    plt.savefig("analyze_result/drip_meter.png")
 
 
 def main():
@@ -335,13 +378,11 @@ def main():
 
     draw_bar_waiting_time_histogram(analyzed_per_discretion_level)
 
-    draw_regi_waiting_time_histogram(
-        {
-            "1": analyzed_per_discretion_level["1"]["regi_waiting_times"],
-            "2": analyzed_per_discretion_level["2"]["regi_waiting_times"],
-            "3": analyzed_per_discretion_level["3"]["regi_waiting_times"],
-        }
-    )
+    draw_regi_waiting_time_histogram(analyzed_per_discretion_level)
+    draw_all_waiting_time_histogram(analyzed_per_discretion_level)
+    draw_drip_meter_histgram(analyzed_list)
+
+
 
     # discretion_level = 1 の人のレジ待ち時間の平均
     print(np.mean(analyzed_per_discretion_level["1"]["regi_waiting_times"]))
@@ -349,7 +390,7 @@ def main():
     print(np.mean(analyzed_per_discretion_level["2"]["regi_waiting_times"]))
 
     # drip_meterの平均値を求める
-    print(np.mean([i["average_drip_meter"] for i in analyzed_list]))
+    
 
     # num_of_people_dict[str(discretion_level)].append(
     #     {"from": analyzed["name"], "value": analyzed["num_of_people"]}
